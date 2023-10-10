@@ -1,0 +1,79 @@
+# Copyright (C) 2022 Analog Devices, Inc.
+#
+# SPDX short identifier: ADIBSD
+import time
+
+import adi
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy import signal
+
+# Create radio
+sdr = adi.ad9361(uri="ip:192.168.2.1")
+
+# Configure properties
+sdr.rx_rf_bandwidth = 1000000
+sdr.sample_rate = 1000000
+sdr.rx_lo = 70000000
+sdr.tx_lo = 70000000
+sdr.tx_cyclic_buffer = True
+sdr.tx_hardwaregain_chan0 = -30
+sdr.gain_control_mode_chan0 = "slow_attack"
+sdr.tx_hardwaregain_chan1 = -30
+sdr.gain_control_mode_chan1 = "slow_attack"
+
+# Configuration data channels
+sdr.rx_enabled_channels = [0 ,1]
+sdr.tx_enabled_channels = [0, 1]
+
+# Read properties
+print("RX LO %s" % (sdr.rx_lo))
+
+# Create a sinewave waveform
+fs = int(sdr.sample_rate)
+N = 32768
+#fc = int(1000000 / (fs / N)) * (fs / N)
+fc=10000
+ts = 1 / float(fs)
+t = np.arange(0, N * ts, ts)
+i = np.cos(2 * np.pi * t * fc) * 2 ** 14
+q = np.sin(2 * np.pi * t * fc) * 2 ** 14
+iq = i + 1j * q
+
+i1 = np.cos(2 * np.pi * t * fc - np.pi) * 2 ** 14
+q1 = np.sin(2 * np.pi * t * fc- np.pi) * 2 ** 14
+iq1 = i1 + 1j * q1
+# Send data
+sdr.tx([iq ,iq1])
+for r in range(20):
+    data = sdr.rx()
+
+Rx_0=data[0]
+Rx_1=data[1] 
+plt.plot(Rx_0)
+plt.plot(Rx_1)
+#Rx_01 = sorted(Rx_0, key=lambda x: x.real)
+#Rx_11 = sorted(Rx_1, key=lambda x: x.real)
+#posortowaneRx0=Rx_01[:5]
+#posortowaneRx1=Rx_11[:5]
+kąt_w_stopniach = (np.angle(Rx_0)-np.angle(Rx_1)) * (180 / np.pi)
+print(kąt_w_stopniach)
+#print(len(Rx_0))
+# Collect data
+#while 1:
+#    x = sdr.rx()
+#    b = np.imag(x)
+    #f, Pxx_den = signal.periodogram(x, fs)
+    #plt.clf()
+    #plt.semilogy(f, Pxx_den)
+    #plt.ylim([1e-7, 1e2])
+    #plt.xlabel("frequency [Hz]")
+    #plt.ylabel("PSD [V**2/Hz]")
+    #plt.draw()
+    #plt.plot(b)
+    #plt.pause(0.05)
+    #print(b)
+    #time.sleep(0.5)
+    #plt.cla()
+
+plt.show()
