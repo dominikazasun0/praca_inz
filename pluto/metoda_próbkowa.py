@@ -6,6 +6,8 @@ import adi
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy import signal
+import time
+
 
 tabela0=[]
 tabela0_1=[]
@@ -68,14 +70,8 @@ for r in range(20):
     próbki_na_okres=(1/fc)/(1/sdr.sample_rate)
     Rx_0=data[0]
     Rx_1=data[1] 
-#plt.plot(Rx_0)
-#plt.plot(Rx_1[2*int(próbki_na_okres):])
-#plt.show()
-#plt.plot(Rx_0[10000:])
-#print(Rx_0
-#plt.show()
-#print(Rx_1)
-#for i in range (2*int(próbki_na_okres), len(Rx_0)-2*)
+    #print(data[0])
+    
 
     prev=Rx_0[0]
     prev1=Rx_1[0]
@@ -108,13 +104,20 @@ for r in range(20):
     plt.scatter(tabela1[0:7], tabela1_1[0:7], color='black', label='Zero Crossing', marker='o')
     plt.grid()
     plt.show()
-    print(tabela0[0:7])
-    print(tabela1[0:7])
+    #print(tabela0)
+    #print(tab)
+
 
     result = []
     for i in range(20):
-        result.append((tabela1[i] - tabela0[i])/próbki_na_okres)
+        result.append((tabela1[i+100] - tabela0[i+100])/próbki_na_okres)
     print(np.mean(result))
+    tabela0=[]
+    tabela1=[]
+    sdr.tx_destroy_buffer()
+    sdr.tx([iq ,iq1])
+    time.sleep(0.4)
+
 '''
 with open('chanel0.txt', 'w') as plik:
     # Zapisz dane do pliku
