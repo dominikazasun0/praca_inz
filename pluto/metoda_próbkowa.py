@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy import signal
 import time
+import tkinter as tk
 
 
 tabela0=[]
@@ -39,7 +40,7 @@ sdr.tx_enabled_channels = [0, 1] # dwa kanały nadawcze włączone
 #fc = int(1000000 / (fs / N)) * (fs / N)
 
 N = 32768 # wielkość bufora danych (ilość próbek sygnału wysyłana podczas jednej transmisji)
-fc = 10000 # częstotliwość transmitowanego sygnału w Hz
+fc = 50000 # częstotliwość transmitowanego sygnału w Hz
 ts = 1 / float(sdr.sample_rate)
 t = np.arange(0, N * ts, ts)
 
@@ -49,8 +50,8 @@ q = np.sin(2 * np.pi * t * fc) * 2 ** 14
 iq = i + 1j * q
 
 # Sygnał transmitowany na kanał 1            
-i1 = np.cos(2 * np.pi * t * fc -np.pi/2) * 2 ** 14
-q1 = np.sin(2 * np.pi * t * fc -np.pi/2) * 2 ** 14
+i1 = np.cos(2 * np.pi * t * fc ) * 2 ** 14
+q1 = np.sin(2 * np.pi * t * fc) * 2 ** 14
 iq1 = i1 + 1j * q1
 
 '''
@@ -71,8 +72,6 @@ for r in range(20):
     Rx_0=data[0]
     Rx_1=data[1] 
     #print(data[0])
-    
-
     prev=Rx_0[0]
     prev1=Rx_1[0]
 
@@ -93,30 +92,31 @@ for r in range(20):
 
     próbki_na_okres=(1/fc)/(1/sdr.sample_rate)
 
-    x = range(tabela0[0], tabela0[0] + 6 * int(próbki_na_okres))
-    plt.plot(x, Rx_0[tabela0[0]:tabela0[0] + int(6 * próbki_na_okres)])
+    x = range(tabela0[0], tabela0[0] + 6*int(próbki_na_okres))
+    plt.plot(x, Rx_0[tabela0[0]:tabela0[0] + 6*int(próbki_na_okres)])
     plt.scatter(tabela0[0:7], tabela0_1[0:7], color='red', label='Zero Crossing', marker='o')
 
 
 
     x = range(tabela1[0], tabela1[0] + 6 * int(próbki_na_okres))
-    plt.plot(x, Rx_1[tabela1[0]:tabela1[0] + int(6 * próbki_na_okres)])
+    plt.plot(x, Rx_1[tabela1[0]:tabela1[0] + 6*int(próbki_na_okres)])
     plt.scatter(tabela1[0:7], tabela1_1[0:7], color='black', label='Zero Crossing', marker='o')
     plt.grid()
     plt.show()
-    #print(tabela0)
-    #print(tab)
+    print(tabela0[0:5])
+    print(tabela1[0:5])
 
 
     result = []
     for i in range(20):
-        result.append((tabela1[i+100] - tabela0[i+100])/próbki_na_okres)
+        result.append((tabela1[i] - tabela0[i])/próbki_na_okres)
     print(np.mean(result))
     tabela0=[]
     tabela1=[]
     sdr.tx_destroy_buffer()
     sdr.tx([iq ,iq1])
     time.sleep(0.4)
+
 
 '''
 with open('chanel0.txt', 'w') as plik:

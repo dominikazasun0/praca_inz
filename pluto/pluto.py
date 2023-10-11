@@ -100,7 +100,7 @@ class pluto(gr.top_block, Qt.QWidget):
         self.iio_pluto_source_0 = iio.fmcomms2_source_fc32('192.168.2.1' if '192.168.2.1' else iio.get_pluto_uri(), [True, True], 32768)
         self.iio_pluto_source_0.set_len_tag_key('packet_len')
         self.iio_pluto_source_0.set_frequency(70000000)
-        self.iio_pluto_source_0.set_samplerate(1000000)
+        self.iio_pluto_source_0.set_samplerate(2000000)
         self.iio_pluto_source_0.set_gain_mode(0, 'manual')
         self.iio_pluto_source_0.set_gain(0, 10)
         self.iio_pluto_source_0.set_quadrature(True)
@@ -110,11 +110,11 @@ class pluto(gr.top_block, Qt.QWidget):
         self.iio_pluto_sink_0 = iio.fmcomms2_sink_fc32('192.168.2.1' if '192.168.2.1' else iio.get_pluto_uri(), [True, True], 32768, False)
         self.iio_pluto_sink_0.set_len_tag_key('')
         self.iio_pluto_sink_0.set_bandwidth(1000000)
-        self.iio_pluto_sink_0.set_frequency(70010000)
-        self.iio_pluto_sink_0.set_samplerate(1000000)
+        self.iio_pluto_sink_0.set_frequency(70000000)
+        self.iio_pluto_sink_0.set_samplerate(2000000)
         self.iio_pluto_sink_0.set_attenuation(0, 10.0)
         self.iio_pluto_sink_0.set_filter_params('Auto', '', 0, 0)
-        self.analog_sig_source_x_0 = analog.sig_source_c(1000000, analog.GR_COS_WAVE, 10000, 1, 0, 0)
+        self.analog_sig_source_x_0 = analog.sig_source_c(2000000, analog.GR_COS_WAVE, 60000, 1, 0, 1)
 
 
         ##################################################
