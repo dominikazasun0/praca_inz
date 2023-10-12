@@ -22,23 +22,23 @@ sdr = adi.ad9361(uri="ip:192.168.2.1") #Tworzenie radia
 sdr.rx_rf_bandwidth = 1000000 # szerokość pasma odbiornika
 sdr.sample_rate = 6000000 # częstotliwość próbkowania
 sdr.rx_lo = 70000000 # częstotliwość LO odbiornika
-sdr.tx_lo = 70000000 # częstotliwość LO nadajnika
-sdr.tx_cyclic_buffer = True # sygnał nadajnika jest wysyłany w nieskończonej pętli 
-sdr.tx_hardwaregain_chan0 = -30
+#sdr.tx_lo = 70000000 # częstotliwość LO nadajnika
+#sdr.tx_cyclic_buffer = True # sygnał nadajnika jest wysyłany w nieskończonej pętli 
+#sdr.tx_hardwaregain_chan0 = -30
 sdr.gain_control_mode_chan0 = "slow_attack"
 sdr.tx_hardwaregain_chan1 = -30
 sdr.gain_control_mode_chan1 = "slow_attack"
 sdr.rx_buffer_size = 32768
-sdr.tx_buffer_size = 32768
+#sdr.tx_buffer_size = 32768
 
 # Konfiguracja kanałów nadawczych i odbiorczych
 sdr.rx_enabled_channels = [0 ,1] # dwa kanały odbiorcze włączone
-sdr.tx_enabled_channels = [0, 1] # dwa kanały nadawcze włączone
+#sdr.tx_enabled_channels = [0, 1] # dwa kanały nadawcze włączone
 
 # Tworzenie sygnału nadawczego
 #fs = int(sdr.sample_rate)
 #fc = int(1000000 / (fs / N)) * (fs / N)
-
+'''
 N = 32768 # wielkość bufora danych (ilość próbek sygnału wysyłana podczas jednej transmisji)
 fc = 50000 # częstotliwość transmitowanego sygnału w Hz
 ts = 1 / float(sdr.sample_rate)
@@ -62,7 +62,7 @@ plt.show()
 
 # Wysyłanie danych
 sdr.tx([iq ,iq1])
-
+'''
 # Odbiór danych 20 razy (20 x N próbek)
 for r in range(20):
     data = sdr.rx()
@@ -115,9 +115,9 @@ for r in range(20):
     tabela1=[]
     tabela1_1=[]
     tabela0_1=[]
-    sdr.tx_destroy_buffer()
-    sdr.tx([iq ,iq1])
-    time.sleep(0.5)
+    #sdr.tx_destroy_buffer()
+    #sdr.tx([iq ,iq1])
+    #time.sleep(0.5)
 
 
 '''
