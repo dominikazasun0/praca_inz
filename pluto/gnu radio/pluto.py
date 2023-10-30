@@ -24,7 +24,6 @@ from PyQt5 import Qt
 from gnuradio import qtgui
 from gnuradio.filter import firdes
 import sip
-from gnuradio import analog
 from gnuradio import gr
 from gnuradio.fft import window
 import sys
@@ -74,7 +73,8 @@ class pluto(gr.top_block, Qt.QWidget):
         ##################################################
         # Variables
         ##################################################
-        self.samp_rate = samp_rate = 32000
+        self.samp_rate = samp_rate = 8000000
+        self.LO = LO = 250000000
 
         ##################################################
         # Blocks
@@ -99,28 +99,19 @@ class pluto(gr.top_block, Qt.QWidget):
         self.top_layout.addWidget(self._qtgui_sink_x_0_win)
         self.iio_pluto_source_0 = iio.fmcomms2_source_fc32('192.168.2.1' if '192.168.2.1' else iio.get_pluto_uri(), [True, True], 32768)
         self.iio_pluto_source_0.set_len_tag_key('packet_len')
-        self.iio_pluto_source_0.set_frequency(70000000)
-        self.iio_pluto_source_0.set_samplerate(2000000)
+        self.iio_pluto_source_0.set_frequency(LO)
+        self.iio_pluto_source_0.set_samplerate(samp_rate)
         self.iio_pluto_source_0.set_gain_mode(0, 'manual')
         self.iio_pluto_source_0.set_gain(0, 10)
         self.iio_pluto_source_0.set_quadrature(True)
         self.iio_pluto_source_0.set_rfdc(True)
         self.iio_pluto_source_0.set_bbdc(True)
         self.iio_pluto_source_0.set_filter_params('Auto', '', 0, 0)
-        self.iio_pluto_sink_0 = iio.fmcomms2_sink_fc32('192.168.2.1' if '192.168.2.1' else iio.get_pluto_uri(), [True, True], 32768, False)
-        self.iio_pluto_sink_0.set_len_tag_key('')
-        self.iio_pluto_sink_0.set_bandwidth(1000000)
-        self.iio_pluto_sink_0.set_frequency(70000000)
-        self.iio_pluto_sink_0.set_samplerate(2000000)
-        self.iio_pluto_sink_0.set_attenuation(0, 10.0)
-        self.iio_pluto_sink_0.set_filter_params('Auto', '', 0, 0)
-        self.analog_sig_source_x_0 = analog.sig_source_c(2000000, analog.GR_COS_WAVE, 60000, 1, 0, 1)
 
 
         ##################################################
         # Connections
         ##################################################
-        self.connect((self.analog_sig_source_x_0, 0), (self.iio_pluto_sink_0, 0))
         self.connect((self.iio_pluto_source_0, 0), (self.qtgui_sink_x_0, 0))
 
 
@@ -137,6 +128,14 @@ class pluto(gr.top_block, Qt.QWidget):
 
     def set_samp_rate(self, samp_rate):
         self.samp_rate = samp_rate
+        self.iio_pluto_source_0.set_samplerate(self.samp_rate)
+
+    def get_LO(self):
+        return self.LO
+
+    def set_LO(self, LO):
+        self.LO = LO
+        self.iio_pluto_source_0.set_frequency(self.LO)
 
 
 
