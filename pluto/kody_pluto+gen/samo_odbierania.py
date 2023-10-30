@@ -21,54 +21,26 @@ sdr = adi.ad9361(uri="ip:192.168.2.1") #Tworzenie radia
 # Konfigurowanie własności transmisji
 sdr.rx_rf_bandwidth = 1000000 # szerokość pasma odbiornika
 sdr.sample_rate = 8000000 # częstotliwość próbkowania
-sdr.rx_lo = 550000000 # częstotliwość LO odbiornika
-#sdr.tx_lo = 70000000 # częstotliwość LO nadajnika
-#sdr.tx_cyclic_buffer = True # sygnał nadajnika jest wysyłany w nieskończonej pętli 
-#sdr.tx_hardwaregain_chan0 = -30
+sdr.rx_lo = 400000000 # częstotliwość LO odbiornika
 sdr.gain_control_mode_chan0 = "slow_attack"
-#sdr.tx_hardwaregain_chan1 = -30
 sdr.gain_control_mode_chan1 = "slow_attack"
 sdr.rx_buffer_size = 32768
-#sdr.tx_buffer_size = 32768
 
 # Konfiguracja kanałów nadawczych i odbiorczych
 sdr.rx_enabled_channels = [0 ,1] # dwa kanały odbiorcze włączone
-#sdr.tx_enabled_channels = [0, 1] # dwa kanały nadawcze włączone
 
-# Tworzenie sygnału nadawczego
-#fs = int(sdr.sample_rate)
-#fc = int(1000000 / (fs / N)) * (fs / N)
-fc = 8000 # częstotliwość transmitowanego sygnału w H
-'''
-N = 32768 # wielkość bufora danych (ilość próbek sygnału wysyłana podczas jednej transmisji)
-ts = 1 / float(sdr.sample_rate)
-t = np.arange(0, N * ts, ts)
+#Ustawienia generatora (do wykresu)
+moc =-40
+fg=400140000
+faza=0
 
-# Sygnał transmitowany na kanał 0
-i = np.cos(2 * np.pi * t * fc) * 2 ** 14
-q = np.sin(2 * np.pi * t * fc) * 2 ** 14
-iq = i + 1j * q
-
-# Sygnał transmitowany na kanał 1            
-i1 = np.cos(2 * np.pi * t * fc - np.pi/2) * 2 ** 14
-q1 = np.sin(2 * np.pi * t * fc - np.pi/2) * 2 ** 14
-iq1 = i1 + 1j * q1
-
-
-plt.plot(iq1)
-plt.plot(iq)
-plt.show()
-
-
-# Wysyłanie danych
-sdr.tx([iq ,iq1])
-'''
+result_seria=[]
 # Odbiór danych 20 razy (20 x N próbek)
-while 1 :
+for m in range(200) :
     data = sdr.rx()
 
 #Podział odebranych danych na kanał 1 i 0
-    próbki_na_okres=(1/fc)/(1/sdr.sample_rate)
+    #próbki_na_okres=(1/fc)/(1/sdr.sample_rate)
     Rx_0=data[0]
     Rx_1=data[1] 
     #print(data[0])
@@ -90,8 +62,9 @@ while 1 :
         prev1=Rx_1[j]
 
 
-    próbki_na_okres=(1/fc)/(1/sdr.sample_rate)
-
+    #próbki_na_okres=(1/fc)/(1/sdr.sample_rate)
+    próbki_na_okres=tabela0[1]-tabela0[0]
+    '''
     x = range(tabela0[0], tabela0[0] + 6*int(próbki_na_okres))
     plt.plot(x, Rx_0[tabela0[0]:tabela0[0] + 6*int(próbki_na_okres)])
     plt.scatter(tabela0[0:7], tabela0_1[0:7], color='red', label='Zero Crossing', marker='o')
@@ -103,26 +76,33 @@ while 1 :
     plt.scatter(tabela1[0:7], tabela1_1[0:7], color='black', label='Zero Crossing', marker='o')
     plt.grid()
     plt.show()
-    print(tabela0[0:5])
-    print(tabela1[0:5])
-
-    print(len(tabela1))
-    print(len(tabela0))
+    '''
     result = []
     
-    for i in range(60):
-        result.append((tabela0[i] - tabela1[i])/próbki_na_okres)
-    print(np.mean(result))
+    if tabela0[0] < tabela1[0] :
+        for i in range(len(tabela1)-150) :
+            result.append((tabela1[i] - tabela0[i])*(360/próbki_na_okres))
+    else :
+        for j in range(20) :
+            result.append((tabela1[j+1] - tabela0[j])*(360/próbki_na_okres))
+    #print('Różnica fazy w stopniach:',np.mean(result))    
+    #plt.title(f'LO={sdr.rx_lo} fs={sdr.sample_rate} fc={fc}')
+    result_seria.append(np.mean(result))
     
     tabela0=[]
     tabela1=[]
     tabela1_1=[]
     tabela0_1=[]
 
+plt.plot(result_seria)
+plt.title('Metod bez aproksymacji - fg={}, fs={}, moc={}, faza={}'.format(fg, sdr.sample_rate, moc, faza))
+plt.grid()
+plt.show()
+'''
 
-with open('chanel0.txt', 'w') as plik:
+with open('result_seria.txt', 'w') as plik:
     # Zapisz dane do pliku
-    for element in Rx_0:
+    for element in result_seria:
         plik.write(str(element) + '\n')
 
 with open('chanel1.txt', 'w') as plik:
@@ -130,3 +110,4 @@ with open('chanel1.txt', 'w') as plik:
     for element in Rx_1:
         plik.write(str(element) + '\n')        
 
+'''
