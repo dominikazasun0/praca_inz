@@ -48,13 +48,13 @@ q = np.sin(2 * np.pi * t * fc) * 2 ** 14
 iq = i + 1j * q
 
 # Sygnał transmitowany na kanał 1
-i1 = np.cos(2 * np.pi * t * fc) * 2 ** 14
-q1 = np.sin(2 * np.pi * t * fc) * 2 ** 14
+i1 = np.cos(2 * np.pi * t * fc -np.pi/2) * 2 ** 14
+q1 = np.sin(2 * np.pi * t * fc -np.pi/2) * 2 ** 14
 iq1 = i1 + 1j * q1
 
 
-plt.plot(iq1)
-plt.plot(iq)
+#plt.plot(iq1)
+#plt.plot(iq)
 #plt.show()
 
 
@@ -62,7 +62,7 @@ plt.plot(iq)
 sdr.tx([iq ,iq1])
 
 # Odbiór danych 20 razy (20 x N próbek)
-for r in range(20):
+for a in range(10):
     data = sdr.rx()
 
 #Podział odebranych danych na kanał 1 i 0
@@ -72,54 +72,64 @@ for r in range(20):
     prev1=Rx_1[0]
 
     for i in range(0,len(Rx_0)):
-        if (Rx_0[i].real <= 0 and prev.real > 0) or  Rx_0[i].real == 0:
-            tabela0.append(i)
-            tabela0_1.append(Rx_0[i].real)
-        prev=Rx_0[i]
+        if i>200 and i<len(Rx_0)-200 :
+            if (Rx_0[i].real <= 0 and prev.real > 0) or  Rx_0[i].real == 0:
+                tabela0.append(i)
+                tabela0_1.append(Rx_0[i].real)
+            prev=Rx_0[i]
 
     for j  in range(0,len(Rx_1)):
-        if (Rx_1[j].real <= 0 and prev1.real > 0) or  Rx_1[i].real == 0:
-            tabela1.append(j)
-            tabela1_1.append(Rx_1[j].real)
-        #print("było 0")
-        prev1=Rx_1[j]
+        if j>200 and j<len(Rx_1)-200 :
+            if (Rx_1[j].real <= 0 and prev1.real > 0) or  Rx_1[j].real == 0:
+                tabela1.append(j)
+                tabela1_1.append(Rx_1[j].real)
+            prev1=Rx_1[j]
     
     próbki_na_okres=tabela0[1]-tabela0[0]
     
-    chan0_plot_start = int(tabela0[0])
-    chan0_plot_stop = int(tabela0[0]) + int(6*próbki_na_okres)
-    x = range(chan0_plot_start,chan0_plot_stop)
-    plt.plot(x, Rx_0[chan0_plot_start:chan0_plot_stop])
-    plt.scatter(tabela0[0:7], tabela0_1[0:7], color='red', label='Zero Crossing', marker='o')
+    #chan0_plot_start = int(tabela0[4])
+    #chan0_plot_stop = int(tabela0[4]) + int(6*próbki_na_okres)
+    #x = range(chan0_plot_start,chan0_plot_stop)
+    #plt.plot(x, Rx_0[chan0_plot_start:chan0_plot_stop])
+    #plt.scatter(tabela0[0:7], tabela0_1[0:7], color='red', label='Zero Crossing', marker='o')
 
     
-    x = range(tabela1[0], tabela1[0] + 6 * int(próbki_na_okres))
-    plt.plot(x, Rx_1[tabela1[0]:tabela1[0] + 6*int(próbki_na_okres)])
-    plt.scatter(tabela1[0:7], tabela1_1[0:7], color='black', label='Zero Crossing', marker='o')
-    plt.grid()
+    #x = range(tabela1[4], tabela1[4] + 6 * int(próbki_na_okres))
+    #plt.plot(x, Rx_1[tabela1[4]:tabela1[4] + 6*int(próbki_na_okres)])
+    #plt.scatter(tabela1[4:11], tabela1_1[4:11], color='black', label='Zero Crossing', marker='o')
+    #plt.grid()
     #plt.show()
-    print(tabela0[0:5])
-    print(tabela1[0:5])
+ 
+    print(tabela0[0:12])
+    print(tabela1[0:12])
+    #print(len(tabela0))
+    #print(len(tabela1))
 
     
     result = []
     
     
-    print(próbki_na_okres)
+    #print(próbki_na_okres)
     if tabela0[0] < tabela1[0] :
-        for i in range(len(tabela1)-150) :
-            result.append((tabela1[i] - tabela0[i])*(360/próbki_na_okres))
+        for i in range(len(tabela1)-5) :
+            result.append(tabela1[i] - tabela0[i])
     else :
-        for i in range(20) :
-            result.append((tabela0[i] - tabela1[i])*(360/próbki_na_okres))
-    print('Różnica fazy w stopniach:',np.mean(result))    
-    plt.title(f'LO={sdr.rx_lo} fs={sdr.sample_rate} fc={fc}')
+        for j in range(len(tabela1)-5) :
+            result.append(tabela0[j] - tabela1[j])
+    #print('Różnica fazy w stopniach:',np.mean(result))
+      
+    print('Różnica fazy w stopniach:',result)   
+    #plt.title(f'LO={sdr.rx_lo} fs={sdr.sample_rate} fc={fc} phase_diff={np.mean(result)}')
+    plt.plot(Rx_0[200:len(Rx_0)-200])
+    plt.plot(Rx_1[200:len(Rx_0)-200])
     plt.grid()
     plt.show()
     tabela0=[]
     tabela1=[]
     tabela1_1=[]
     tabela0_1=[]
+    Rx_0=[]
+    Rx_1=[]
     sdr.tx_destroy_buffer()
     sdr.tx([iq ,iq1])
     time.sleep(1)
