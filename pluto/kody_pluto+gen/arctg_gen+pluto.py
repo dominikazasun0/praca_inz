@@ -71,10 +71,19 @@ for m in range(225) :
 
             #subst=abs(phase_1_seria-phase_0_seria)
             #min_val=subst[0]
+            
             phase_diff.append(phase_0-phase_1)
- 
-
-        print(np.mean(phase_diff))
+        okres=[]
+        prev=phase_diff[0]
+        for j in range(len(phase_diff)):
+            #if phase_diff[j] < 0 :
+            #    minus=minus+1
+            #elif phase_diff[j] > 0 :
+            #    plus=plus+1
+            if prev>0 and phase_diff[j]<0:
+                okres.append(j)
+            prev=phase_diff[j]
+        print(okres)
         phase_diff_mean.append(np.mean(phase_diff))
 
         time.sleep(1)
@@ -102,6 +111,7 @@ for m in range(225) :
         Rx_1_img=[]
         Rx_1_real=[]
         Rx_1_sum=[]
+        okres=[]
         phase_0_seria=[]
         phase_1_seria=[]
         phase_diff=[]
@@ -112,15 +122,15 @@ moc =-40     # Moc sygnału
 fg = 800020000 # Częstotliwość ustawiona na generatorze
 plt.legend(loc='upper left')
 plt.plot(phase_diff_mean)
-plt.title('Metod arctg- fg={}, fs={},\nmoc={}, faza=zmiana o 45 co 1'.format(fg, sdr.sample_rate, moc))
-#plt.title('Metod arctg - fg={}, fs={},\nmoc={}'.format(fg, sdr.sample_rate, moc))
+#plt.title('Metod arctg- fg={}, fs={},\nmoc={}, faza=zmiana o 45 co 1'.format(fg, sdr.sample_rate, moc))
+plt.title('Metod arctg - fg={}, fs={},\nmoc={}'.format(fg, sdr.sample_rate, moc))
 plt.xlabel("Iteracja odbioru próbek")
 plt.ylabel("Różnica fazy [°]")
 plt.grid()
-plt.savefig('arctg/pom3.svg', format='svg')
+plt.savefig('arctg/pom4.svg', format='svg')
 plt.show()
 
-with open('arctg/pom3.txt', 'w') as plik:
+with open('arctg/pom4.txt', 'w') as plik:
     # Zapisz dane do pliku
     for element in phase_diff_mean:
         plik.write(str(element) + '\n')
