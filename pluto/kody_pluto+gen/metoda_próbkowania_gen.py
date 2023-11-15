@@ -91,7 +91,7 @@ for m in range(200) :
         print('Różnica fazy w stopniach:',np.mean(result))
         
         result_seria.append(np.mean(result))
-        
+        '''
         # Tworzenie wykresów
         chan0_plot_start = tabela0[0]
         chan0_plot_stop = tabela0[0] + przebieg*próbki_na_okres
@@ -115,7 +115,7 @@ for m in range(200) :
         plt.plot(Rx_1)
         plt.grid()
         plt.show()
-        
+        '''
         print("\n")
         
         # Usuwanie danych po pomiarze
@@ -124,7 +124,7 @@ for m in range(200) :
         tabela1=[]
         tabela1_1=[]
         tabela0_1=[]
-        time.sleep(1)
+        
 
     else:
         data=[]    

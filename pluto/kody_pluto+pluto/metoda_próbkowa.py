@@ -48,8 +48,8 @@ q = np.sin(2 * np.pi * t * fc) * 2 ** 14
 iq = i + 1j * q
 
 # Sygnał transmitowany na kanał 1
-i1 = np.cos(2 * np.pi * t * fc -np.pi/2) * 2 ** 14
-q1 = np.sin(2 * np.pi * t * fc -np.pi/2) * 2 ** 14
+i1 = np.cos(2 * np.pi * t * fc) * 2 ** 14
+q1 = np.sin(2 * np.pi * t * fc) * 2 ** 14
 iq1 = i1 + 1j * q1
 
 

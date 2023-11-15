@@ -7,21 +7,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy import signal
 import time
-#import tkinter as tk
-
-def oblicz_prosta(x1, y1, x2, y2):
-    # Oblicz współczynnik kierunkowy (slope) prostej
-    m = (y2 - y1) / (x2 - x1)
-    
-    # Oblicz przesunięcie wertykalne (y-intercept) prostej (b) używając jednego z punktów
-    b = y1 - m * x1
-    
-    # Wyświetl równanie prostej
-    
-    # Oblicz miejsce zerowe (x-intercept) prostej (gdzie y = 0)
-    x_intercept = -b / m
-    
-    return x_intercept
+import math
 
 
 tabela0=[]      # Miejsca zerowe chan0
@@ -37,15 +23,35 @@ przebieg=6   # Liczba okresów sygnału jakie chcemy zobaczyć
 
 # Konfigurowanie własności transmisji
 sdr = adi.ad9361(uri="ip:192.168.2.1") #Tworzenie radia
+
+# Konfigurowanie własności transmisji
 sdr.rx_rf_bandwidth = 1000000 # szerokość pasma odbiornika
-sdr.sample_rate = 10000000 # częstotliwość próbkowania
-sdr.rx_lo = 800000000 # częstotliwość LO odbiornika
+sdr.sample_rate = 5500000 # częstotliwość próbkowania
+sdr.rx_lo = 70000000 # częstotliwość LO odbiornika
+sdr.tx_lo = 70000000 # częstotliwość LO nadajnika
+sdr.tx_cyclic_buffer = True # sygnał nadajnika jest wysyłany w nieskończonej pętli 
+sdr.tx_hardwaregain_chan0 = -30
 sdr.gain_control_mode_chan0 = "slow_attack"
+sdr.tx_hardwaregain_chan1 = -30
 sdr.gain_control_mode_chan1 = "slow_attack"
 sdr.rx_buffer_size = 32768
-sdr.rx_enabled_channels = [0 ,1] # dwa kanały odbiorcze włączone
+sdr.tx_buffer_size = 32768
+sdr.tx_enabled_channels = [0, 1] # dwa kanały nadawcze włączone
+N = 32768 # wielkość bufora danych (ilość próbek sygnału wysyłana podczas jednej transmisji)
+fc = 50000 # częstotliwość transmitowanego sygnału w Hz
+ts = 1 / float(sdr.sample_rate)
+t = np.arange(0, N * ts, ts)
+# Sygnał transmitowany na kanał 0
+i = np.cos(2 * np.pi * t * fc) * 2 ** 14
+q = np.sin(2 * np.pi * t * fc) * 2 ** 14
+iq = i + 1j * q
 
+# Sygnał transmitowany na kanał 1
+i1 = np.cos(2 * np.pi * t * fc) * 2 ** 14
+q1 = np.sin(2 * np.pi * t * fc) * 2 ** 14
+iq1 = i1 + 1j * q1
 
+sdr.tx([iq ,iq1])
 # Odbiór danych
 for m in range(225) :
     data = sdr.rx()
@@ -54,43 +60,19 @@ for m in range(225) :
 #Podział odebranych danych na kanał 1 i 0
         
         # Poszukiwanie punktu w którym sygnały się przecinają na początku sygnału i wybranie go jako początkowy punkt analizy
-        subst=abs(data[0].real-data[1].real)
-        min_val=subst[0]
-        for a in range(1,1000):
-            if (subst[a] < min_val) :
-                min_val=subst[a]
-                min_index=a
-        Rx_0 = np.array(data[0][min_index:len(data[0])-200])
-        Rx_1 = np.array(data[1][min_index:len(data[1])-200])
+        Rx_0 = data[0]
+        Rx_1 = data[1]
         
-        
-        # Detekcja miejsc zerowych
-        prev_0 = Rx_0[0]
-        prev_1 = Rx_1[0]
-        
-        for i  in range(0,len(Rx_0)):
-            if Rx_0[i].real == 0 and prev_0.real > 0:
-                tabela0.append(i)
-                tabela0_1.append(Rx_0[i].real)
-            elif Rx_0[i].real <= 0 and prev_0.real > 0 :
-                tabela0.append(oblicz_prosta(i-1,prev_0.real,i,Rx_0[i].real))
-                tabela0_1.append(0)
-            prev_0=Rx_0[i]
-
-        for j  in range(0,len(Rx_1)):
-            if Rx_1[j].real == 0 and prev_1.real > 0:
-                tabela1.append(j)
-                tabela1_1.append(Rx_1[j].real)
-            elif Rx_1[j].real <= 0 and prev_1.real > 0 :
-                tabela1.append(oblicz_prosta(j-1,prev_1.real,j,Rx_1[j].real))
-                tabela1_1.append(0)
-            prev_1=Rx_1[j]
-        
-        próbki_na_okres=tabela0[1]-tabela0[0]
-
-        
+        for i in range(len(Rx_0)) :
+            phase_chan1=math.atan(Rx_1.imag[i]/Rx_1.real[i])
+            phase_chan0=math.atan(Rx_0.imag[i]/Rx_0.real[i])
+            if Rx_0.imag[i] > Rx_1.imag[i] :
+                print(Rx_0.imag[i])
+                print("faza",(phase_chan0-phase_chan1)*(180/np.pi))
+            else :
+                print("faza",(phase_chan0-phase_chan1)*(180/np.pi))
         # Obliczenie różnicy fazy
-        
+        '''
         for i in range(min(len(tabela0),len(tabela1))) :
             if tabela0[i] < tabela1[i] :
                 result.append((tabela1[i] - tabela0[i])*(360/próbki_na_okres))
@@ -99,7 +81,7 @@ for m in range(225) :
         print('Różnica fazy w stopniach:',np.mean(result))
         
         result_seria.append(np.mean(result))
-
+        '''
         # Tworzenie wykresów
         '''
         chan0_plot_start = int(tabela0[0])
@@ -120,8 +102,8 @@ for m in range(225) :
         plt.grid()
         plt.show()
         '''
-        plt.plot(Rx_0)
-        plt.plot(Rx_1)
+        plt.plot(Rx_0[:1500])
+        plt.plot(Rx_1[:1500])
         plt.grid()
         plt.show()
         
@@ -138,7 +120,7 @@ for m in range(225) :
 
     else:
         data=[]    
-
+'''
 moc =-40     # Moc sygnału
 fg = 1500060000 # Częstotliwość ustawiona na generatorze
 plt.plot(result_seria[1:],marker='o', linestyle='-')
@@ -154,7 +136,7 @@ with open('10_11/sym_16.txt', 'w') as plik:
     # Zapisz dane do pliku
     for element in result_seria:
         plik.write(str(element) + '\n')
-'''
+
 with open('chanel1.txt', 'w') as plik:
     # Zapisz dane do pliku
     for element in Rx_1:
