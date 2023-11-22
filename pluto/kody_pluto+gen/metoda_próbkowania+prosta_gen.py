@@ -30,7 +30,8 @@ tabela1=[]      # Miejsca zerowe chan1
 tabela1_1=[]    # Wartości miejsc zerowych chan1
 result_seria=[] # Zapis wyników pomiaru
 result = []
-
+moc =-40     # Moc sygnału
+fg = 800040000 # Częstotliwość ustawiona na generatorze
 #Dane do wykresu
 
 przebieg=6   # Liczba okresów sygnału jakie chcemy zobaczyć
@@ -101,7 +102,7 @@ for m in range(225) :
         result_seria.append(np.mean(result))
 
         # Tworzenie wykresów
-        '''
+        
         chan0_plot_start = int(tabela0[0])
         chan0_plot_stop = int(tabela0[0]) + int(przebieg*próbki_na_okres)
 
@@ -119,9 +120,11 @@ for m in range(225) :
         plt.title(f'diff={np.mean(result)}')
         plt.grid()
         plt.show()
-        '''
-        plt.plot(Rx_0)
-        plt.plot(Rx_1)
+    
+        plt.plot(Rx_1, 'r',label="chan1")
+        plt.plot(Rx_0, 'k', label="chan0")
+        plt.legend(loc='upper left')
+        plt.title('Metod z aproksymacją - fg={}, fs={},\nmoc={}'.format(fg, sdr.sample_rate, moc))
         plt.grid()
         plt.show()
         
