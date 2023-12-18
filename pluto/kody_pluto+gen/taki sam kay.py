@@ -11,11 +11,11 @@ import math
 
 # Konfigurowanie własności transmisji
 sdr = adi.ad9361(uri="ip:192.168.2.1") #Tworzenie radia
-
+f=60000
 # Konfigurowanie własności transmisji
 sdr.rx_rf_bandwidth = 1000000 # szerokość pasma odbiornika
 sdr.sample_rate = 10000000 # częstotliwość próbkowania
-sdr.rx_lo = 800000000 # częstotliwość LO odbiornika
+sdr.rx_lo = 500000000 # częstotliwość LO odbiornika
 sdr.tx_cyclic_buffer = True # sygnał nadajnika jest wysyłany w nieskończonej pętli 
 sdr.gain_control_mode_chan0 = "slow_attack"
 sdr.gain_control_mode_chan1 = "slow_attack"
@@ -39,7 +39,7 @@ diff=[]
 for m in range(360) :
     data = sdr.rx()
     
-    if m % 8 == 0:
+    if m % 8 == 0: #analizuję co 8 serię danych,zmiana kąta na generatorze jest widoczna co około 8
         Rx_0=data[0]
         Rx_1=data[1]
 
@@ -47,18 +47,18 @@ for m in range(360) :
 
             #Rx_0_real=np.append(Rx_0_real,Rx_0[i].real)
             #Rx_0_img=np.append(Rx_0_img,Rx_0[i].imag)
-            Rx_0_sum=np.append(Rx_0_sum,Rx_0[i].real+Rx_0[i].imag)
-            phase_0=np.rad2deg(np.arctan(Rx_0[i].imag/Rx_0[i].real))
+            Rx_0_sum=np.append(Rx_0_sum,Rx_0[i].real+Rx_0[i].imag) #obliczenie sygnału z kanału 0
+            phase_0=np.rad2deg(np.arctan(Rx_0[i].imag/Rx_0[i].real)) #obliczenie arctg kanału 0
             phase_0_seria=np.append(phase_0_seria,phase_0)
 
             #Rx_1_real=np.append(Rx_1_real,Rx_1[i].real)
             #Rx_1_img=np.append(Rx_1_img,Rx_1[i].imag)
-            Rx_1_sum=np.append(Rx_1_sum,Rx_1[i].real+Rx_1[i].imag)
-            phase_1=np.rad2deg(np.arctan(Rx_1[i].imag/Rx_1[i].real))
+            Rx_1_sum=np.append(Rx_1_sum,Rx_1[i].real+Rx_1[i].imag) #obliczenie sygnału z kanału 1
+            phase_1=np.rad2deg(np.arctan(Rx_1[i].imag/Rx_1[i].real)) #obliczenie arctg kanału 1
             phase_1_seria=np.append(phase_1_seria,phase_1)
 
-        diff=phase_0_seria-phase_1_seria
-        subst=abs(Rx_1_sum-Rx_0_sum)
+        diff=phase_0_seria-phase_1_seria #obliczenie różnicy fazy
+        subst=abs(Rx_1_sum-Rx_0_sum) #obliczenie punktu początkowego
         min_index= None
         min_val=subst[0]
         for a in range(1,200):
@@ -73,7 +73,7 @@ for m in range(360) :
 
         prev_0 = Rx_0[0]
         prev_1 = Rx_1[0]
-
+        #ustalanie który sygnał pierwszy osiaga miejsce zerowe
         for i in range(1,len(Rx_0)-1):
             if Rx_0[i] <= 0 and prev_0 > 0 :
                 zmienna=i
@@ -93,7 +93,7 @@ for m in range(360) :
         #print("chan0", zmienna)
         #print("chan1", zmienna_1)
             #print("/n")
-  
+        #wybranie odpowiedniej wartości sygnału prostokątnego róznicy fazy
         if zmienna<zmienna_1:
             for l in range(len(diff)):
                 if diff[l] > 0:
@@ -128,7 +128,7 @@ for m in range(360) :
     else:
         data=[]    
 moc =-40     # Moc sygnału
-fg = 800040000 # Częstotliwość ustawiona na generatorze
+fg = sdr.rx_lo+f # Częstotliwość ustawiona na generatorze
 plt.legend(loc='upper left')
 plt.plot(srednia)
 #plt.title('Metod arctg- fg={}, fs={},\nmoc={}, faza=zmiana o 45 co 1'.format(fg, sdr.sample_rate, moc))

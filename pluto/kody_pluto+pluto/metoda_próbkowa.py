@@ -86,7 +86,6 @@ for a in range(10):
             prev1=Rx_1[j]
     
     próbki_na_okres=tabela0[1]-tabela0[0]
-    
     #chan0_plot_start = int(tabela0[4])
     #chan0_plot_stop = int(tabela0[4]) + int(6*próbki_na_okres)
     #x = range(chan0_plot_start,chan0_plot_stop)
@@ -112,13 +111,13 @@ for a in range(10):
     #print(próbki_na_okres)
     if tabela0[0] < tabela1[0] :
         for i in range(len(tabela1)-5) :
-            result.append(tabela1[i] - tabela0[i])
+            result.append((tabela1[i] - tabela0[i])/(próbki_na_okres*360))
     else :
         for j in range(len(tabela1)-5) :
-            result.append(tabela0[j] - tabela1[j])
+            result.append((tabela0[j] - tabela1[j])/(próbki_na_okres*360))
     #print('Różnica fazy w stopniach:',np.mean(result))
       
-    print('Różnica fazy w stopniach:',result)   
+    print('Różnica fazy w stopniach:',np.mean(result))   
     #plt.title(f'LO={sdr.rx_lo} fs={sdr.sample_rate} fc={fc} phase_diff={np.mean(result)}')
     plt.plot(Rx_0[200:len(Rx_0)-200])
     plt.plot(Rx_1[200:len(Rx_0)-200])
@@ -136,7 +135,7 @@ for a in range(10):
 
 
 
-
+'''
 with open('chanel0.txt', 'w') as plik:
     # Zapisz dane do pliku
     for element in Rx_0:
@@ -146,3 +145,4 @@ with open('chanel1.txt', 'w') as plik:
     # Zapisz dane do pliku
     for element in Rx_1:
         plik.write(str(element) + '\n')        
+'''

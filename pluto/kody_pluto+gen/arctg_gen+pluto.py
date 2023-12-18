@@ -11,17 +11,16 @@ import math
 
 # Konfigurowanie własności transmisji
 sdr = adi.ad9361(uri="ip:192.168.2.1") #Tworzenie radia
-
+f=10000
 # Konfigurowanie własności transmisji
 sdr.rx_rf_bandwidth = 1000000 # szerokość pasma odbiornika
 sdr.sample_rate = 10000000 # częstotliwość próbkowania
-sdr.rx_lo = 800000000 # częstotliwość LO odbiornika 
+sdr.rx_lo = 475000000 # częstotliwość LO odbiornika 
 sdr.gain_control_mode_chan0 = "slow_attack"
 sdr.gain_control_mode_chan1 = "slow_attack"
 sdr.rx_buffer_size = 32768
 
-moc =-40     # Moc sygnału
-fg = 800040000 # Częstotliwość ustawiona na generatorze
+
 Rx_0_img=[]
 Rx_0_real=[]
 Rx_0_sum=[]
@@ -74,6 +73,7 @@ for m in range(360) :
         prev_0 = Rx_0[0]
         prev_1 = Rx_1[0]
 
+
         for i in range(1,len(Rx_0)-1):
             if Rx_0[i] <= 0 and prev_0 > 0 :
                 zmienna=i
@@ -90,6 +90,9 @@ for m in range(360) :
                 break
             prev_1=Rx_1[j]
 
+            
+
+
         #print("chan0", zmienna)
         #print("chan1", zmienna_1)
         #print("/n")
@@ -103,18 +106,19 @@ for m in range(360) :
                     phase_diff.append(abs(diff[l]))            
         print(np.mean(phase_diff))
         srednia.append(np.mean(phase_diff))
-        
+        '''
         plt.plot(Rx_1, 'r',label="chan1")
         plt.plot(Rx_0, 'k', label="chan0")
         plt.plot(phase_1_seria, label="arctg ch1")
         plt.plot(phase_0_seria, label="arctg ch0")
         plt.plot(diff, label="arctg ch0 - arctg ch1")
-        plt.title('Metod arctg- fg={}, fs={},\nmoc={}'.format(fg, sdr.sample_rate, moc))
+        #plt.title('Metod arctg- fg={}, fs={},\nmoc={}'.format(fg, sdr.sample_rate, moc))
         plt.legend(loc='upper left')
         plt.grid()
         plt.show()
         
         time.sleep(0.1)
+        '''
         Rx_0_sum=[]
         Rx_1_sum=[]
         Rx_0_img=[]
@@ -133,17 +137,17 @@ for m in range(360) :
         data=[]    
 
 moc =-40     # Moc sygnału
-fg = 800040000 # Częstotliwość ustawiona na generatorze
+fg = sdr.rx_lo+f # Częstotliwość ustawiona na generatorze
 plt.legend(loc='upper left')
 plt.plot(srednia)
 plt.title('Metod arctg - fg={}, fs={},\nmoc={} LO={} faza=zamiana do 0 do 45 co 1°'.format(fg, sdr.sample_rate, moc,sdr.rx_lo))
 plt.xlabel("Iteracja odbioru próbek")
 plt.ylabel("Różnica fazy [°]")
 plt.grid()
-plt.savefig('arctg_pomiary/pom{}_zmiana.svg'.format(fg), format='svg')
+plt.savefig('arctg_pomiary/pom{}_zmiana_1.svg'.format(fg), format='svg')
 plt.show()
 
-with open('arctg_pomiary/pom{}_zmiana.txt'.format(fg), 'w') as plik:
+with open('arctg_pomiary/pom{}_zmiana_1.txt'.format(fg), 'w') as plik:
      #Zapisz dane do pliku
     for element in srednia:
         plik.write(str(element) + '\n')

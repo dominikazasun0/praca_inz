@@ -5,7 +5,7 @@ from scipy import signal
 import time
 import math
 
-phase=3/5
+phase=181/180
 srednia=[]
 t = np.arange(0, 25,0.1)
 zmienna=0
@@ -13,13 +13,13 @@ zmienna_1=0
 dominika=[]
 
 # Sygnał transmitowany na kanał 0
-i = np.cos(t) * 75
-q = np.sin(t) * 75
+i = np.cos(t-np.pi*(phase)) * 75
+q = np.sin(t-np.pi*(phase)) * 75
 iq = i + 1j * q
 
 # Sygnał transmitowany na kanał 1
-i1 = np.cos(t-np.pi*(phase)) * 75
-q1 = np.sin(t-np.pi*(phase)) * 75
+i1 = np.cos(t) * 75
+q1 = np.sin(t) * 75
 iq1 = i1 + 1j * q1
 
 iq1_1=iq1.real+iq1.imag
@@ -28,6 +28,7 @@ iq_1=iq.real+iq.imag
 phase_0=(np.arctan(iq.imag/iq.real))*(180/np.pi)
 phase_1=(np.arctan(iq1.imag/iq1.real))*(180/np.pi)
 diff=phase_0-phase_1
+
 
 for i in range(len(phase_0)):
     if phase_0[i]>phase_1[i]:
@@ -75,11 +76,13 @@ else:
 
 
 plt.title('faza={}pi wynik={}'.format(phase, np.mean(srednia)))
-plt.plot(dominika)
+#plt.plot(dominika)
 #plt.plot(diff[min_index:])
-plt.plot(Rx_0)
-plt.plot(Rx_1)
+plt.plot(iq_1, label='1')
+plt.plot(iq1_1, label='2')
+plt.plot(diff)
 plt.grid()
+plt.legend(loc='upper left')
 #plt.plot(phase_1)
 #plt.savefig('symulacje_arctg/sym9_1.svg', format='svg')
 plt.show()

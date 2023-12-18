@@ -18,7 +18,7 @@ for a in range(len(t)) :
     phase1=math.atan2(q[a],i[a])
     ampl1=pow((i[a]*i[a])+(q[a]*q[a]),0.5)
     x.append(a)
-    phase.append(phase1)
+    phase.append(phase1) 
     ampl.append(ampl1)
 # Sygnał transmitowany na kanał 1
 i1 = np.cos(t-np.pi)

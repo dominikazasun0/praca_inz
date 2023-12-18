@@ -1,31 +1,63 @@
 import matplotlib.pyplot as plt
 import numpy as np
+import statistics
+sub=[]
+srednia=[]
+x=[20000, 30000, 40000, 50000, 60000, 70000, 80000, 90000]
+f=10000
+for j in range(20000,100000,10000):
+    with open("arctg_pomiary_pluto+pluto/arctg_LO599999998_fc{}_fs10000000.txt".format(j), "r") as file:
+        numbers = [float(line.strip()) for line in file]
+        prev=numbers[6]
+        for i in range(7,len(numbers)-1):
+            zmienna=abs(1-(abs(numbers[i]-prev)))
+            sub.append(zmienna)
+            prev=numbers[i]
+            #print(srednia)
+    srednia.append(np.max(sub)) 
+    sub=[]
+    
+'''
 
-srednia = []
-wszystkie_sub = []  # Lista list, przechowująca wyniki sub dla każdego pliku
+for j in range(600000000,1000000000,100000000):
+        #print(f+j)
+    with open("arctg_pomiary/pom{}_zmiana.txt".format(f+j), "r") as file:
+        numbers = [float(line.strip()) for line in file]
+        prev=numbers[1]
+        for i in range(2,len(numbers)-3):
+            zmienna=abs(1-(abs(numbers[i]-prev)))
+            if zmienna<0.8 :
+                sub.append(zmienna)
+            prev=numbers[i]
+        #print(srednia)
+    srednia.append(np.mean(sub)) 
+    #plt.plot(np.mean(sub), label="{}".format(f+j))
+    #plt.show()  
 
-for numer_pliku in range(1, 20, 2):
-    nazwa_pliku = f"sym_{numer_pliku}.txt"
-    sciezka_pliku = f"10_11/pomiary_800M_f_zmienne/pomiary/{nazwa_pliku}"
+  
 
-    sub = []
+#    print(len(srednia)) 
 
-    with open(sciezka_pliku, "r") as plik:
-        numbers = [float(line.strip()) for line in plik]
-        prev = numbers[1]
-        for i in range(2, len(numbers) - 3):
-            sub.append(abs(1 - (abs(numbers[i] - prev))))
-            prev = numbers[i]
+plt.title("Bład względny pomiaru zmiany o 1 stopień f={} fs=10000000".format(f+j))
+plt.xlabel("Mierzony stopień")
+plt.ylabel("Bład względny pomiaru")
+plt.plot(sub)
+plt.grid()
+plt.show()
+plt.savefig('arctg_pomiary/wyniki/{}.svg'.format(f+j), format='svg')        
 
-    wszystkie_sub.append(sub)  # Dodanie wyników sub dla danego pliku do listy wszystkie_sub
+plt.title("Średni bład względny pomiaru zmiany o 1 stopień fs=10000000 \ndla różnych fg-LO")
+#print(srednia[0:4])
+plt.xlabel("fg-LO")
+plt.ylabel("Średni bład względny")
 
-# Wygenerowanie wykresu
-for i, sub in enumerate(wszystkie_sub):
-    plt.plot(sub, label=f"sym_{2*i + 1}.txt")  # Dodanie etykiety z nazwą pliku
-    plt.title("Błąd względny pomiaru zmiany o 1 stopień f=800100000 fs=10000000")
-    plt.xlabel("Mierzony stopień")
-    plt.ylabel("Błąd względny pomiaru")
-    plt.legend()  # Dodanie legendy
-    plt.grid()
-    plt.show()
+plt.plot(range(10000,60000,10000),srednia[:5], label="fg=600M")
+plt.plot(range(10000,60000,10000),srednia[5:10], label="fg=700M")
+plt.plot(range(10000,60000,10000),srednia[10:15], label="fg=800M")
+plt.plot(range(10000,50000,10000),srednia[15:19], label="fg=900M")
+'''
+plt.plot(x,srednia,marker='o')
+plt.legend(loc='upper left')
+plt.grid()
+plt.show()
 

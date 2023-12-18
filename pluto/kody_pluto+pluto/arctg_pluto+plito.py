@@ -74,14 +74,14 @@ for m in range(20) :
     Rx_0=np.array(data[0])
     Rx_1=np.array(data[1])
     for i in range(len(Rx_0)):
-        Rx_0_real=np.append(Rx_0_real,Rx_0[i].real)
-        Rx_0_img=np.append(Rx_0_img,Rx_0[i].imag)
+        #Rx_0_real=np.append(Rx_0_real,Rx_0[i].real)
+        #Rx_0_img=np.append(Rx_0_img,Rx_0[i].imag)
         Rx_0_sum=np.append(Rx_0_sum,Rx_0[i].real+Rx_0[i].imag)
         phase_0=np.rad2deg(np.arctan(Rx_0[i].imag/Rx_0[i].real))
         phase_0_seria=np.append(phase_0_seria,phase_0)
 
-        Rx_1_real=np.append(Rx_1_real,Rx_1[i].real)
-        Rx_1_img=np.append(Rx_1_img,Rx_1[i].imag)
+        #Rx_1_real=np.append(Rx_1_real,Rx_1[i].real)
+        #Rx_1_img=np.append(Rx_1_img,Rx_1[i].imag)
         Rx_1_sum=np.append(Rx_1_sum,Rx_1[i].real+Rx_1[i].imag)
         phase_1=np.rad2deg(np.arctan(Rx_1[i].imag/Rx_1[i].real))
         phase_1_seria=np.append(phase_1_seria,phase_1)
