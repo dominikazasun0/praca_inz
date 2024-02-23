@@ -34,9 +34,9 @@ sdr = adi.ad9361(uri="ip:192.168.2.1") #Tworzenie radia
 
 # Konfigurowanie własności transmisji
 sdr.rx_rf_bandwidth = 1000000 # szerokość pasma odbiornika
-sdr.sample_rate = 5500000 # częstotliwość próbkowania
-sdr.rx_lo = 70000000 # częstotliwość LO odbiornika
-sdr.tx_lo = 70000000 # częstotliwość LO nadajnika
+sdr.sample_rate = 1000000 # częstotliwość próbkowania
+sdr.rx_lo = 500000000 # częstotliwość LO odbiornika
+sdr.tx_lo = 500000000 # częstotliwość LO nadajnika
 sdr.tx_cyclic_buffer = True # sygnał nadajnika jest wysyłany w nieskończonej pętli 
 sdr.tx_hardwaregain_chan0 = -30
 sdr.gain_control_mode_chan0 = "slow_attack"
@@ -106,7 +106,7 @@ for r in range(20):
         prev1=Rx_1[j]
     
     próbki_na_okres=tabela0[1]-tabela0[0]
-    '''
+    
     chan0_plot_start = int(tabela0[0])
     chan0_plot_stop = int(tabela0[0]) + int(6*próbki_na_okres)
     x = range(chan0_plot_start,chan0_plot_stop)
@@ -118,13 +118,13 @@ for r in range(20):
     plt.plot(x, Rx_1[tabela1[0]:tabela1[0] + 6*int(próbki_na_okres)])
     plt.scatter(tabela1[0:7], tabela1_1[0:7], color='black', label='Zero Crossing', marker='o')
     plt.grid()
-    #plt.show()
+    plt.show()
     '''
     plt.plot(Rx_0)
     plt.plot(Rx_1)
     plt.grid()
     plt.show()
-    
+    '''
     result = []
     
     print(próbki_na_okres)
@@ -135,7 +135,7 @@ for r in range(20):
         for i in range(20) :
             result.append((tabela0[i] - tabela1[i])*(360/próbki_na_okres))
     print('Różnica fazy w stopniach:',np.mean(result))    
-    plt.title(f'LO={sdr.rx_lo} fs={sdr.sample_rate} fc={fc}')
+    #plt.title(f'LO={sdr.rx_lo} fs={sdr.sample_rate} fc={fc}')
     
     tabela0=[]
     tabela1=[]

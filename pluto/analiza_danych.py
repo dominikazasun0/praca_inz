@@ -5,18 +5,31 @@ sub=[]
 srednia=[]
 x=[20000, 30000, 40000, 50000, 60000, 70000, 80000, 90000]
 f=10000
-for j in range(20000,100000,10000):
-    with open("arctg_pomiary_pluto+pluto/arctg_LO599999998_fc{}_fs10000000.txt".format(j), "r") as file:
+error=0
+for i in range(2500,20000,2500) :
+    with open("pomiary_02_02/0.25_stopnia/seria_3/pomiar{}_LO1.5GHz.txt".format(i), "r") as file:
         numbers = [float(line.strip()) for line in file]
-        prev=numbers[6]
-        for i in range(7,len(numbers)-1):
-            zmienna=abs(1-(abs(numbers[i]-prev)))
-            sub.append(zmienna)
-            prev=numbers[i]
-            #print(srednia)
-    srednia.append(np.max(sub)) 
+        #print(numbers)
+        start=numbers[4]
+        for j in range(5,len(numbers)-1):
+            sub.append(abs(numbers[j]-start))
+            if abs(numbers[j]-start) != 1:
+                error=error+1
+            start=numbers[j]
+        print(sub)
+        print(error)
+        plt.plot(sub,marker='o', linestyle='-', markersize=2)
+        plt.title("{} LO1.5GHz fs{} error={}".format(i, 360*i,error))
+        plt.grid()
+        plt.xlabel("Numer pomairu")
+        plt.ylabel("Zmierzona różnica fazy [°]")
+        plt.savefig('pomiary_02_02/0.25_stopnia/seria_3/wykres{}_LO1.5GHz.svg'.format(i), format='svg')  
+        plt.show()
     sub=[]
-    
+    error=0
+#sub=[]    
+
+
 '''
 
 for j in range(600000000,1000000000,100000000):
@@ -55,9 +68,12 @@ plt.plot(range(10000,60000,10000),srednia[:5], label="fg=600M")
 plt.plot(range(10000,60000,10000),srednia[5:10], label="fg=700M")
 plt.plot(range(10000,60000,10000),srednia[10:15], label="fg=800M")
 plt.plot(range(10000,50000,10000),srednia[15:19], label="fg=900M")
-'''
-plt.plot(x,srednia,marker='o')
+
+plt.plot(sub)
+plt.title("Układ Pluto + Pluto\n Metoda próbkowania LO=800MHz fc=10kHz")
+plt.xlabel("Numer pomiaru [-]")
+plt.ylabel("Błąd względny pomiaru [%]")
 plt.legend(loc='upper left')
 plt.grid()
 plt.show()
-
+'''

@@ -5,7 +5,7 @@
 import adi
 import matplotlib.pyplot as plt
 import numpy as np
-from scipy import signal
+from scipy import signal 
 import time
 
 
@@ -16,8 +16,8 @@ przebieg=6   # Liczba okresów sygnału jakie chcemy zobaczyć
 sdr = adi.ad9361(uri="ip:192.168.2.1") #Tworzenie radia
 sdr.rx_rf_bandwidth = 1000000 # szerokość pasma odbiornika
 sdr.sample_rate = 10000000 # częstotliwość próbkowania
-sdr.rx_lo = 1000000000 # częstotliwość LO odbiornika
-sdr.tx_lo = 1000000000 # częstotliwość LO nadajnika
+sdr.rx_lo = 500000000 # częstotliwość LO odbiornika
+sdr.tx_lo = 500000000 # częstotliwość LO nadajnika
 sdr.tx_cyclic_buffer = True # sygnał nadajnika jest wysyłany w nieskończonej pętli 
 sdr.tx_hardwaregain_chan0 = -30
 sdr.gain_control_mode_chan0 = "slow_attack"
@@ -164,17 +164,20 @@ for fc in range(10000,100000,10000):
             result_seria_arctg.append(abs(np.mean(arctg_diff_pos)))
         '''
     
-        '''
+        
         plt.plot(sum_ch1, 'r',label="chan1")
         plt.plot(sum_ch0, 'k', label="chan0")
-        #plt.plot(arctg_ch1, label="arctg ch1")
-        #plt.plot(arctg_ch0, label="arctg ch0")
+        plt.plot(arctg_ch1, label="arctg ch1")
+        plt.plot(arctg_ch0, label="arctg ch0")
         plt.plot(arctg_diff, label="arctg ch0 - arctg ch1")
-        #plt.title('Metod arctg- fg={}, fs={},\nmoc={}'.format(fg, sdr.sample_rate, moc))
+        plt.xlabel("Próbki [-]")
+        plt.ylabel("Amplituda [-]")
+        plt.title('Metoda arctg')
         plt.legend(loc='upper left')
         plt.grid()
         plt.show()
-        '''
+
+        
 
         sum_ch0=[]
         sum_ch1=[]
