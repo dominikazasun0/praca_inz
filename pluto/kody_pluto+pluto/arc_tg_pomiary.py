@@ -8,14 +8,14 @@ import numpy as np
 from scipy import signal 
 import time
 import statistics
-fs= [10000000]
+fs= [550000]
 
 # Konfigurowanie własności transmisji 
 sdr = adi.ad9361(uri="ip:192.168.2.1") #Tworzenie radia
 sdr.rx_rf_bandwidth = 1000000 # szerokość pasma odbiornika
 #sdr.sample_rate = 50000000 # częstotliwość próbkowania
-sdr.rx_lo = 500000000 # częstotliwość LO odbiornika
-sdr.tx_lo = 500000000 # częstotliwość LO nadajnika
+sdr.rx_lo = 1500000000 # częstotliwość LO odbiornika
+sdr.tx_lo = 1500000000 # częstotliwość LO nadajnika
 sdr.tx_cyclic_buffer = True # sygnał nadajnika jest wysyłany w nieskończonej pętli 
 sdr.tx_hardwaregain_chan0 = -30
 sdr.gain_control_mode_chan0 = "slow_attack"
@@ -56,7 +56,7 @@ for a in fs:
 
     for fc in range (20000, 200000, 20000):
 
-        for e in np.arange(1/180,80/180,1/180):
+        for e in np.arange(1/180,1500/180,2/180):
             data = sdr.rx() #Odbiór danych
             
             for i in range(len(data[0])):
@@ -98,7 +98,7 @@ for a in fs:
                     order.append(1)
                 else:
                     order.append(0)
-            #print(order)
+            print(order)
             if len(order)==0:
                 order.append(1)
 
@@ -119,17 +119,18 @@ for a in fs:
             wyniki_sr.append(np.rad2deg(np.mean(arc_tg_dod)))
             wyniki_med.append(np.rad2deg(statistics.median(arc_tg_dod)))
             
-            #plt.plot(arc_tg_diff)    
+            plt.plot(arc_tg_diff)    
             #plt.plot(arctg_ch1, label="arctg ch1")
             #plt.plot(arctg_ch0, label="arctg ch0")
-            #plt.plot(sum_ch0, 'r-')
-            #plt.plot(sum_ch1, 'b-')
+            plt.plot(sum_ch0, 'r-')
+            plt.plot(sum_ch1, 'b-')
             #plt.xlabel("Próbki [-]")
             #plt.ylabel("Amplituda [-]")
             #plt.title('Metoda arctg')
             #plt.legend(loc='upper left')
-            #plt.grid()
-            #plt.show()
+            plt.grid()
+            plt.show()
+            
             
         
             sum_ch0=[]
@@ -146,14 +147,14 @@ for a in fs:
             q = np.sin(2 * np.pi * t * fc) * 2 ** 14
             iq = i + 1j * q
 
-            i1 = np.cos(2 * np.pi * t * fc +(e*np.pi)+np.pi/2) * 2 ** 14
-            q1 = np.sin(2 * np.pi * t * fc + (e*np.pi)+np.pi/2) * 2 ** 14
+            i1 = np.cos(2 * np.pi * t * fc +(e*np.pi)) * 2 ** 14
+            q1 = np.sin(2 * np.pi * t * fc + (e*np.pi)) * 2 ** 14
             iq1 = i1 + 1j * q1
 
 
             sdr.tx([iq ,iq1])
-            time.sleep(5)
-
+            time.sleep(1)
+        """
         with open('pomiary_21_02/pomiar{}_fs{}_LO500MHz_med.txt'.format(fc,sdr.sample_rate), 'w') as plik:
         # Zapisz dane do pliku
             for element in wyniki_med:
@@ -163,6 +164,6 @@ for a in fs:
         # Zapisz dane do pliku
             for element in wyniki_sr:
                 plik.write(str(element) + '\n')
-
+        """
         wyniki_med=[]
         wyniki_sr=[]
