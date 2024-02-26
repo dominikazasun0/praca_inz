@@ -8,14 +8,14 @@ import numpy as np
 from scipy import signal 
 import time
 import statistics
-fs= [550000]
+fs= [12000000]
 
 # Konfigurowanie własności transmisji 
 sdr = adi.ad9361(uri="ip:192.168.2.1") #Tworzenie radia
 sdr.rx_rf_bandwidth = 1000000 # szerokość pasma odbiornika
 #sdr.sample_rate = 50000000 # częstotliwość próbkowania
-sdr.rx_lo = 1500000000 # częstotliwość LO odbiornika
-sdr.tx_lo = 1500000000 # częstotliwość LO nadajnika
+sdr.rx_lo = 500000000 # częstotliwość LO odbiornika
+sdr.tx_lo = 500000000 # częstotliwość LO nadajnika
 sdr.tx_cyclic_buffer = True # sygnał nadajnika jest wysyłany w nieskończonej pętli 
 sdr.tx_hardwaregain_chan0 = -30
 sdr.gain_control_mode_chan0 = "slow_attack"
@@ -54,9 +54,9 @@ for a in fs:
     ts = 1 / float(sdr.sample_rate)
     t = np.arange(0, N * ts, ts)
 
-    for fc in range (20000, 200000, 20000):
+    for fc in range (60000, 200000, 20000):
 
-        for e in np.arange(1/180,1500/180,2/180):
+        for e in np.arange(1/180,80/180,1/180):
             data = sdr.rx() #Odbiór danych
             
             for i in range(len(data[0])):
@@ -96,7 +96,7 @@ for a in fs:
             for i in range(0,min(len(zeros_ch1),len(zeros_ch0))):
                 if zeros_ch0[i]<zeros_ch1[i]:
                     order.append(1)
-                else:
+                elif zeros_ch0[i]>zeros_ch1[i]:
                     order.append(0)
             print(order)
             if len(order)==0:
@@ -119,17 +119,17 @@ for a in fs:
             wyniki_sr.append(np.rad2deg(np.mean(arc_tg_dod)))
             wyniki_med.append(np.rad2deg(statistics.median(arc_tg_dod)))
             
-            plt.plot(arc_tg_diff)    
+            #plt.plot(arc_tg_diff)    
             #plt.plot(arctg_ch1, label="arctg ch1")
             #plt.plot(arctg_ch0, label="arctg ch0")
-            plt.plot(sum_ch0, 'r-')
-            plt.plot(sum_ch1, 'b-')
+            #plt.plot(sum_ch0, 'ro-')
+            #plt.plot(sum_ch1, 'bo-')
             #plt.xlabel("Próbki [-]")
             #plt.ylabel("Amplituda [-]")
             #plt.title('Metoda arctg')
             #plt.legend(loc='upper left')
-            plt.grid()
-            plt.show()
+            #plt.grid()
+            #plt.show()
             
             
         
@@ -153,8 +153,8 @@ for a in fs:
 
 
             sdr.tx([iq ,iq1])
-            time.sleep(1)
-        """
+            time.sleep(5)
+        
         with open('pomiary_21_02/pomiar{}_fs{}_LO500MHz_med.txt'.format(fc,sdr.sample_rate), 'w') as plik:
         # Zapisz dane do pliku
             for element in wyniki_med:
@@ -164,6 +164,6 @@ for a in fs:
         # Zapisz dane do pliku
             for element in wyniki_sr:
                 plik.write(str(element) + '\n')
-        """
+        
         wyniki_med=[]
         wyniki_sr=[]
