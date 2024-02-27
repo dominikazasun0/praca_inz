@@ -8,14 +8,14 @@ import numpy as np
 from scipy import signal 
 import time
 import statistics
-fs= [12000000]
+fs= [550000, 1000000, 2000000, 4000000, 6000000, 8000000, 10000000]
 
 # Konfigurowanie własności transmisji 
 sdr = adi.ad9361(uri="ip:192.168.2.1") #Tworzenie radia
 sdr.rx_rf_bandwidth = 1000000 # szerokość pasma odbiornika
 #sdr.sample_rate = 50000000 # częstotliwość próbkowania
-sdr.rx_lo = 500000000 # częstotliwość LO odbiornika
-sdr.tx_lo = 500000000 # częstotliwość LO nadajnika
+sdr.rx_lo = 1000000000 # częstotliwość LO odbiornika
+sdr.tx_lo = 1000000000 # częstotliwość LO nadajnika
 sdr.tx_cyclic_buffer = True # sygnał nadajnika jest wysyłany w nieskończonej pętli 
 sdr.tx_hardwaregain_chan0 = -30
 sdr.gain_control_mode_chan0 = "slow_attack"
@@ -54,7 +54,7 @@ for a in fs:
     ts = 1 / float(sdr.sample_rate)
     t = np.arange(0, N * ts, ts)
 
-    for fc in range (60000, 200000, 20000):
+    for fc in range (20000, 140000, 20000):
 
         for e in np.arange(1/180,80/180,1/180):
             data = sdr.rx() #Odbiór danych
@@ -153,14 +153,14 @@ for a in fs:
 
 
             sdr.tx([iq ,iq1])
-            time.sleep(5)
+            time.sleep(10)
         
-        with open('pomiary_21_02/pomiar{}_fs{}_LO500MHz_med.txt'.format(fc,sdr.sample_rate), 'w') as plik:
+        with open('pomiary_21_02/pomiar{}_fs{}_LO1GHz_med.txt'.format(fc,sdr.sample_rate), 'w') as plik:
         # Zapisz dane do pliku
             for element in wyniki_med:
                 plik.write(str(element) + '\n')
         
-        with open('pomiary_21_02/pomiar{}_fs{}_LO500MHz_sr.txt'.format(fc,sdr.sample_rate), 'w') as plik:
+        with open('pomiary_21_02/pomiar{}_fs{}_LO1GHz_sr.txt'.format(fc,sdr.sample_rate), 'w') as plik:
         # Zapisz dane do pliku
             for element in wyniki_sr:
                 plik.write(str(element) + '\n')
