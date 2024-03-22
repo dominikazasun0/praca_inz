@@ -134,8 +134,8 @@ for fc in range (1000, 10000, 1000):
         q = np.sin(2 * np.pi * t * fc) * 2 ** 14
         iq = i + 1j * q
 
-        i1 = np.cos(2 * np.pi * t * fc +(e*np.pi)) * 2 ** 14
-        q1 = np.sin(2 * np.pi * t * fc + (e*np.pi)) * 2 ** 14
+        i1 = np.cos(2 * np.pi * t * fc) * 2 ** 14
+        q1 = np.sin(2 * np.pi * t * fc) * 2 ** 14
         iq1 = i1 + 1j * q1
 
 

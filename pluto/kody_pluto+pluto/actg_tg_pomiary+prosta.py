@@ -61,7 +61,7 @@ for l in lo :
     #print(l)
     sdr.tx_lo = l # częstotliwość LO nadajnika
     sdr.rx_lo = l # częstotliwość LO nadajnika
-    for e in np.arange(1/180,5/180,1/1800):
+    for e in np.arange(1/180,250/180,1/180):
         data = sdr.rx() #Odbiór danych
         
         for i in range(len(data[0])):
@@ -126,13 +126,13 @@ for l in lo :
         for i in range(0,len(arc_tg_diff)):
             if arc_tg_diff[i] > 0:
                 arc_tg_dod.append(arc_tg_diff[i])
-        """        
-        plt.plot(sum_ch0[:100], 'ro-')
-        plt.plot(sum_ch1[:100], 'bo-')
-        plt.plot(np.rad2deg(arc_tg_diff[:100]),'go-') 
-        plt.grid()
-        plt.show()
-        """
+              
+        #plt.plot(sum_ch0[:100], 'ro-')
+        #plt.plot(sum_ch1[:100], 'bo-')
+        #plt.plot(np.rad2deg(arc_tg_diff[:100]),'go-') 
+        #plt.grid()
+        #plt.show()
+        
         print("srednia",np.rad2deg(np.mean(arc_tg_dod)))
         print("mediana",np.rad2deg(statistics.median(arc_tg_dod)))
         print("\n")
@@ -167,15 +167,15 @@ for l in lo :
         q = np.sin(2 * np.pi * t * fc) * 2 ** 14
         iq = i + 1j * q
 
-        i1 = np.cos(2 * np.pi * t * fc -(e*np.pi)) * 2 ** 14
-        q1 = np.sin(2 * np.pi * t * fc -(e*np.pi)) * 2 ** 14
+        i1 = np.cos(2 * np.pi * t * fc) * 2 ** 14
+        q1 = np.sin(2 * np.pi * t * fc) * 2 ** 14
         iq1 = i1 + 1j * q1
 
 
-        sdr.tx([iq ,iq1])
+        sdr.tx([iq ,iq])
         time.sleep(10)
     
-    with open('pomiary_21_02/pomiar{}_fs{}_LO{}GHz_0.1_med.txt'.format(fc,sdr.sample_rate,l/1000000000), 'w') as plik:
+    with open('pomiary_21_02/pomiar{}_fs{}_LO{}GHz_med_long.txt'.format(fc,sdr.sample_rate,l/1000000000), 'w') as plik:
     # Zapisz dane do pliku
         for element in wyniki_med:
             plik.write(str(element) + '\n')

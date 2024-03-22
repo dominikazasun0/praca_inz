@@ -1,79 +1,49 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import statistics
+import matplotlib.pyplot as plt
 sub=[]
-srednia=[]
-x=[20000, 30000, 40000, 50000, 60000, 70000, 80000, 90000]
-f=10000
-error=0
-for i in range(2500,20000,2500) :
-    with open("pomiary_02_02/0.25_stopnia/seria_3/pomiar{}_LO1.5GHz.txt".format(i), "r") as file:
+avg=[]
+LO=[0.6, 0.7, 0.75, 0.8, 0.9, 1.1,1.2,1.25,1.3,1.4,1.6,1.7,1.75,1.8,1.9,2]
+fc_v=[60000, 80000, 100000, 120000,]
+lo_max=[0.5,0.6,0.7,0.75,	0.8,0.9	,1	,1.1,	1.2,	1.21,	1.22,	1.23,	1.24,	1.25,	1.26,	1.27,	1.275,	1.28,	1.29,	1.3,	1.35,	1.4,	1.6,	1.7,	1.71,	1.72,	1.73,	1.74,	1.75,	1.76,	1.77,	1.78,	1.79,	1.8,	1.9,	2]
+
+fs_v=[549999, 1000000, 2000000,4000000,6000000,8000000,10000000,12000000]
+LO_1=[0.5, 0.6, 0.7, 0.8, 0.9, 1.1, 1.2,1.3,1.4,1.5,1.6,1.7,1.8,1.9,2.0]
+#for fc in fc_v :
+for lo in LO_1:
+    with open("pomiary_21_02/pomiar80000_fs6000000_LO0.8GHz_med_long_1.txt", "r") as file:
         numbers = [float(line.strip()) for line in file]
-        #print(numbers)
         start=numbers[4]
-        for j in range(5,len(numbers)-1):
-            sub.append(abs(numbers[j]-start))
-            if abs(numbers[j]-start) != 1:
-                error=error+1
-            start=numbers[j]
-        print(sub)
-        print(error)
-        plt.plot(sub,marker='o', linestyle='-', markersize=2)
-        plt.title("{} LO1.5GHz fs{} error={}".format(i, 360*i,error))
+        for j in range(5, len(numbers) - 1):
+            error = abs(abs(numbers[j] - start) - 1)
+            #print(numbers[j],start,error)
+            if error < 20:
+                if abs(abs(180 - numbers[j] - start) - 1) > error or j!=163 or j!=164:  # Warunek dodania drugiego typu błędu
+                    #print(error)
+                    sub.append(error)
+            start = numbers[j]
+        plt.plot(sub)
+        plt.title("Zależność mierzonej róznicy fazy od błędu pomiaru \n dla LO=0.8GHz, fs=6MHz, fc=80kHz")
         plt.grid()
-        plt.xlabel("Numer pomairu")
-        plt.ylabel("Zmierzona różnica fazy [°]")
-        plt.savefig('pomiary_02_02/0.25_stopnia/seria_3/wykres{}_LO1.5GHz.svg'.format(i), format='svg')  
+        plt.xlabel("Numer pomiaru [N]")
+        plt.ylabel("Różnica fazy [°]")
+        plt.savefig("long.svg")
         plt.show()
-    sub=[]
-    error=0
-#sub=[]    
+        avg.append(np.mean(sub))
+        #sub=[]
+        
+        #plt.ylim(0,0.05)
+    #plt.plot(LO,avg,'-',marker ='o', markersize='3',label="{}kHz".format(fc/1000))
+    #avg=[]
 
 
-'''
-
-for j in range(600000000,1000000000,100000000):
-        #print(f+j)
-    with open("arctg_pomiary/pom{}_zmiana.txt".format(f+j), "r") as file:
-        numbers = [float(line.strip()) for line in file]
-        prev=numbers[1]
-        for i in range(2,len(numbers)-3):
-            zmienna=abs(1-(abs(numbers[i]-prev)))
-            if zmienna<0.8 :
-                sub.append(zmienna)
-            prev=numbers[i]
-        #print(srednia)
-    srednia.append(np.mean(sub)) 
-    #plt.plot(np.mean(sub), label="{}".format(f+j))
-    #plt.show()  
-
-  
-
-#    print(len(srednia)) 
-
-plt.title("Bład względny pomiaru zmiany o 1 stopień f={} fs=10000000".format(f+j))
-plt.xlabel("Mierzony stopień")
-plt.ylabel("Bład względny pomiaru")
-plt.plot(sub)
 plt.grid()
-plt.show()
-plt.savefig('arctg_pomiary/wyniki/{}.svg'.format(f+j), format='svg')        
 
-plt.title("Średni bład względny pomiaru zmiany o 1 stopień fs=10000000 \ndla różnych fg-LO")
-#print(srednia[0:4])
-plt.xlabel("fg-LO")
-plt.ylabel("Średni bład względny")
-
-plt.plot(range(10000,60000,10000),srednia[:5], label="fg=600M")
-plt.plot(range(10000,60000,10000),srednia[5:10], label="fg=700M")
-plt.plot(range(10000,60000,10000),srednia[10:15], label="fg=800M")
-plt.plot(range(10000,50000,10000),srednia[15:19], label="fg=900M")
-
-plt.plot(sub)
-plt.title("Układ Pluto + Pluto\n Metoda próbkowania LO=800MHz fc=10kHz")
-plt.xlabel("Numer pomiaru [-]")
-plt.ylabel("Błąd względny pomiaru [%]")
+plt.plot(LO_1,avg,'bo-')
+plt.ylabel("Wartość średnia błędu pomiaru [°]")
+plt.title("Zależność częstotliwość LO od błędu pomiaru \n dla fs=2MHz, fc=80kHz")
 plt.legend(loc='upper left')
-plt.grid()
+plt.xlabel("Częstotliwość LO [GHz]")
+#plt.savefig("Zmienne_LO_fs2M_średnie.svg")
 plt.show()
-'''
