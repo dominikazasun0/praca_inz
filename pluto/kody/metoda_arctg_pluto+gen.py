@@ -14,24 +14,18 @@ def prosta(x1,y1,x0,y0):
     b=y0-a*x0
     return -b/a
 
-lo= [800000000]
 # Konfigurowanie własności transmisji 
 sdr = adi.ad9361(uri="ip:192.168.2.1") #Tworzenie radia
-sdr.sample_rate = 6000000 # częstotliwość próbkowania
+sdr.sample_rate = 2000000 # częstotliwość próbkowania
 sdr.rx_rf_bandwidth = sdr.sample_rate # szerokość pasma odbiornika
-sdr.tx_rf_bandwidth = sdr.sample_rate # szerokość pasma odbiornikasdr.rx_lo = 1200000000 # częstotliwość LO odbiornika
-
-sdr.tx_cyclic_buffer = True # sygnał nadajnika jest wysyłany w nieskończonej pętli 
-sdr.tx_hardwaregain_chan0 = -30
+sdr.rx_lo = 1000050000 # częstotliwość LO odbiornika
 sdr.gain_control_mode_chan0 = "slow_attack"
-sdr.tx_hardwaregain_chan1 = -30
 sdr.gain_control_mode_chan1 = "slow_attack"
 sdr.rx_buffer_size = 32768
 sdr.tx_buffer_size = 32768
 
 
-sdr.rx_enabled_channels = [0 ,1] # dwa kanały odbiorcze włączone
-sdr.tx_enabled_channels = [0, 1] # dwa kanały nadawcze włączone
+sdr.rx_enabled_channels = [0,1] # dwa kanały odbiorcze włączone
 
 N=sdr.tx_buffer_size
 
@@ -49,19 +43,9 @@ zeros_ch0=[]      # Miejsca zerowe chan0
 zeros_ch1=[]      # Miejsca zerowe chan1
 
 wyniki_med=[]
-#Dane do wykresu
-# Wysyłanie danych
-ts = 1 / float(sdr.sample_rate)
-t = np.arange(0, N * ts, ts)
-# Odbiór danych
 
-fc=80000
-
-for l in lo :
-    #print(l)
-    sdr.tx_lo = l # częstotliwość LO nadajnika
-    sdr.rx_lo = l # częstotliwość LO nadajnika
-    for e in np.arange(1/180,250/180,1/180):
+for e in range(250):
+    if e%5==0 :
         data = sdr.rx() #Odbiór danych
         
         for i in range(len(data[0])):
@@ -112,31 +96,29 @@ for l in lo :
                     order.append(1)
                 else:
                     order.append(0)
-        print(order)
+        #print(order)
 
         
 
-        if statistics.median(order)==1:
+        if statistics.median(order)==0:
             arc_tg_diff=arctg_ch0-arctg_ch1
         else:
             arc_tg_diff=arctg_ch1-arctg_ch0
-        
-        #print(arc_tg_diff)
+
         
         for i in range(0,len(arc_tg_diff)):
             if arc_tg_diff[i] > 0:
                 arc_tg_dod.append(arc_tg_diff[i])
-              
+             
         #plt.plot(sum_ch0[:100], 'ro-')
         #plt.plot(sum_ch1[:100], 'bo-')
         #plt.plot(np.rad2deg(arc_tg_diff[:100]),'go-') 
         #plt.grid()
         #plt.show()
         
-        print("srednia",np.rad2deg(np.mean(arc_tg_dod)))
+        print("Numer pomairu", e/5)
         print("mediana",np.rad2deg(statistics.median(arc_tg_dod)))
         print("\n")
-        #wyniki_sr.append(np.rad2deg(np.mean(arc_tg_dod)))
         wyniki_med.append(np.rad2deg(statistics.median(arc_tg_dod)))
         
         #plt.plot(arc_tg_diff)   
@@ -161,29 +143,11 @@ for l in lo :
         zeros_ch1=[]
         arc_tg_dod=[]
         order=[]
-        sdr.tx_destroy_buffer()
+        
+        time.sleep(13)
 
-        i = np.cos(2 * np.pi * t * fc) * 2 ** 14
-        q = np.sin(2 * np.pi * t * fc) * 2 ** 14
-        iq = i + 1j * q
+with open('26_03/pomiar{}_fs{}_LO{}GHz_zmiana.txt'.format(50000,sdr.sample_rate,1), 'w') as plik:
+# Zapisz dane do pliku
+    for element in wyniki_med:
+        plik.write(str(element) + '\n')
 
-        i1 = np.cos(2 * np.pi * t * fc) * 2 ** 14
-        q1 = np.sin(2 * np.pi * t * fc) * 2 ** 14
-        iq1 = i1 + 1j * q1
-
-
-        sdr.tx([iq ,iq])
-        time.sleep(10)
-    
-    with open('pomiary_21_02/pomiar{}_fs{}_LO{}GHz_med_long.txt'.format(fc,sdr.sample_rate,l/1000000000), 'w') as plik:
-    # Zapisz dane do pliku
-        for element in wyniki_med:
-            plik.write(str(element) + '\n')
-    
-    #with open('pomiary_21_02/pomiar{}_fs{}_LO{}_sr.txt'.format(fc,sdr.sample_rate,a), 'w') as plik:
-    # Zapisz dane do pliku
-    #    for element in wyniki_sr:
-    #        plik.write(str(element) + '\n')
-    
-    wyniki_med=[]
-    #wyniki_sr=[]
