@@ -1,49 +1,70 @@
 import numpy as np
 import matplotlib.pyplot as plt
-I=100
-Q=100
-f=50
+
+I = 1
+Q = 1
+f = 1
+
+# Liczba punktów na 1 okres
+num_points_per_period = 1000
+
+# Okres sygnału
+period = 1 / f
+
+# Liczba punktów całkowitych (maksymalny czas)
+num_points_total = int(num_points_per_period * 2*period)
+
 # Tworzenie danych dla sinusoidy
-t = np.linspace(0.0095, 0.05, 1000)  # 100 punktów równomiernie rozłożonych od 0 do 2*pi
-y = Q*np.sin(2*np.pi*f*t+np.pi/4)  # sinus dla każdego punktu x
-y1= I*np.cos(2*np.pi*f*t+np.pi/4)
+t = np.linspace(0, 2*period, num_points_total)  # Generowanie czasu od 0 do okresu, z określoną liczbą punktów
+y = Q * np.sin(2 * np.pi * f * t)  # Sygnał Q
+y1 = I * np.cos(2 * np.pi * f * t)  # Sygnał I
+i = np.cos(2 * np.pi * f * t)  # Sygnał cosinusowy
+q = np.sin(2 * np.pi * f * t)  # Sygnał sinusowy
+iq = i + 1j * q  # Sygnał zespolony
 
-y4 = Q*np.sin(2*np.pi*f*t)  # sinus dla każdego punktu x
-y5= I*np.cos(2*np.pi*f*t)
+i1 = np.cos(2 * np.pi * f * t - (1*np.pi)/4)  # Przesunięcie fazowe I
+q1 = np.sin(2 * np.pi * f * t - (1*np.pi)/4)  # Przesunięcie fazowe Q
+iq1 = i1 + 1j * q1  # Sygnał zespolony po przesunięciu fazowym
 
-y3=np.arctan(y/y1)
-y2=((I**2+Q**2)**0.5)*np.cos(t+y3)
-
-"""
-subst=abs(y-y1)
-min_val=subst[0]
-for a in range(1,1000):
-    if (subst[a] < min_val) :
-        min_val=subst[a]
-        min_index=a
-Rx_0 = np.array(y[min_index:len(y)])
-Rx_1 = np.array(y1[min_index:len(y)])
-""" 
-# Tworzenie wykresu
-#plt.plot(y5)
-#plt.plot(y1)
-plt.plot(y4+y5,'b',label="0")
-plt.plot(y+y1,'r', label="pi/4")
-plt.plot(np.rad2deg(np.arctan(y4/y5)),label="0")
-plt.plot(np.rad2deg(np.arctan(y/y1)),label="pi/4")
-plt.plot(np.rad2deg(np.arctan(y/y1)-np.arctan(y4/y5)),label="pi/4-0")
-plt.title('Przykładowy przebieg z nieprawidłowo\nwybranym punktem początkowym')
-plt.xlabel('Czas [s]')
-plt.ylabel('Amplituda [n]')
-plt.legend(loc='upper left')
-plt.grid(True)
+# Plotowanie sygnałów
+color=(0,0,1)
+plt.plot(iq.real+iq.imag, "r")
+plt.plot(iq1.real+iq1.imag, "b")
+#plt.plot(iq1.real, "b", label='135 real')
+#plt.plot(iq.imag, "k", label='0 imag')
+#plt.plot(iq1.imag, "g", label='135 imag')
+#plt.plot(np.rad2deg(np.arctan(q / i)), color="lightcoral", label='0')
+#plt.plot(np.rad2deg(np.arctan(q1 / i1)), color="lightskyblue", label='135')
+plt.plot(np.arctan(q / i) - np.arctan(q1/ i1), "k")
+plt.xlabel("$f_{LO}$ [GHz]")
+plt.ylabel("Amplituda [rad]")
+plt.grid()
+plt.legend(loc='upper right')
 plt.show()
-"""
-plt.plot(t[min_index:],Rx_0,'b')
-plt.plot(t[min_index:],Rx_1,'r')
-plt.title('Przykładowy przebieg z nieprawidłowo\nwybranym punktem początkowym')
-plt.xlabel('Czas [s]')
-plt.ylabel('Amplituda [n]')
-plt.grid(True)
+print(iq1.imag[185])
+print(iq1.real[185])
+print(iq.real[185])
+print(iq.imag[185])
+
+import matplotlib.pyplot as plt
+
+
+fig, ax1 = plt.subplots()
+
+# Tworzenie pierwszej osi Y po lewej stronie
+color = "r"
+ax1.set_xlabel('Czas [s]')
+ax1.set_ylabel('Amplituda [-]', color="k")
+ax1.plot(t, i+q, "r")
+#ax1.plot(t, i1+q1, color=color)
+ax1.tick_params(axis='y', labelcolor="k")
+plt.grid()
+# Tworzenie drugiej osi Y po prawej stronie
+ax2 = ax1.twinx()  
+color = "b"
+ax2.set_ylabel('Amplituda [rad]', color="k")
+ax2.plot(t, np.arctan(q/ i), color="k")
+ax2.tick_params(axis='y', labelcolor="k")
+
+
 plt.show()
-"""

@@ -1,11 +1,3 @@
-#Celem pomiaru jest sprawdzenia działania metody próbkowania
-#1) Pierwsza seria pomiarów polega na ziwększaniu przesunięcia fazowego między sygnałami o 1st
-#Pomiary będą przeprowadzane dla LO=500M, 1GHz, 1.5GHZ
-#dla f sygnału = 10kHz....., 150kHz co 20kHz
-#założeniem pomairu jest detekcja z rozdzielczością 1st, co wymaga żeby sygnał mierzony miał 360 próbek na okres
-#częstotliwość próbkowania będzie dobierana tak żeby sygnał każdy sygnał miał 360 próbek na okres
-#zakłądam że każdy z pomiarów ma długość bufora taką żeby zmieściło się w nim 200 okresów sygnału
-
 #https://github.com/analogdevicesinc/pyadi-iio/blob/master/examples/ad9361_example.py
 # Copyright (C) 2022 Analog Devices, Inc.
 #
@@ -26,7 +18,7 @@ tabela1_1=[]
 
 sdr = adi.ad9361(uri="ip:192.168.2.1") #Tworzenie radia
 wyniki=[]
-próbki_na_okres=360*8
+próbki_na_okres=360
 # Konfigurowanie własności transmisji
 sdr.rx_rf_bandwidth = 1000000 # szerokość pasma odbiornika
 
@@ -52,9 +44,9 @@ N = próbki_na_okres*200 # wielkość bufora danych (ilość próbek sygnału wy
 
 
 
-for fc in range (1000, 10000, 1000):
+for fc in range (20000, 30000, 40000):
 
-    sdr.sample_rate = fc*360*8 # częstotliwość próbkowania
+    sdr.sample_rate = fc*360 # częstotliwość próbkowania
     ts = 1 / float(sdr.sample_rate)
     t = np.arange(0, N * ts, ts)
 
@@ -93,7 +85,7 @@ for fc in range (1000, 10000, 1000):
                 result.append((tabela1[i] - tabela0[i]))
             else :
                 result.append((tabela0[i] - tabela1[i]))
-        """
+        
         #print(próbki_na_okres)
         if tabela0[0] < tabela1[0] :
             for i in range(min(len(tabela1), len(tabela0))) :
@@ -102,31 +94,35 @@ for fc in range (1000, 10000, 1000):
             for j in range(min(len(tabela1), len(tabela0))) :
                 result.append((tabela0[j] - tabela1[j]))
         
-        with open('wyniki_29_01/wyniki/{}.txt'.format(datetime.now()), 'w') as plik:
+        with open('wyniki_29_01/wyniki/{}.txt'.format(statistics.median(result)), 'w') as plik:
         # Zapisz dane do pliku
             for element in result:
                 plik.write(str(element) + '\n')
 
-        with open('wyniki_29_01/Rx_0/Rx_0{}.txt'.format(datetime.now()), 'w') as plik:
+        with open('wyniki_29_01/Rx_0/Rx_0{}.txt'.format(statistics.median(result)), 'w') as plik:
         # Zapisz dane do pliku
             for element in Rx_0.real:
                 plik.write(str(element) + '\n')
 
-        with open('wyniki_29_01/Rx_1/Rx_1{}.txt'.format(datetime.now()), 'w') as plik:
+        with open('wyniki_29_01/Rx_1/Rx_1{}.txt'.format(statistics.median(result)), 'w') as plik:
         # Zapisz dane do pliku
             for element in Rx_1.real:
                 plik.write(str(element) + '\n')
         
-        with open('wyniki_29_01/tabela0/tabela0{}.txt'.format(datetime.now()), 'w') as plik:
+        with open('wyniki_29_01/tabela0/tabela0{}.txt'.format(statistics.median(result)), 'w') as plik:
         # Zapisz dane do pliku
             for element in tabela0:
                 plik.write(str(element) + '\n')
+        with open('wyniki_29_01/tabela1/tabela1{}.txt'.format(statistics.median(result)), 'w') as plik:
+        # Zapisz dane do pliku
+            for element in tabela1:
+                plik.write(str(element) + '\n')
         
-        """
         wyniki.append(statistics.median(result)*(360/próbki_na_okres))
         print("Różnica w próbkach mediana:" ,statistics.median(result))
         print('Różnica fazy w stopniach:',statistics.median(result)*(360/próbki_na_okres))   
-
+        #plt.plot(data[0].real)
+        #plt.show()
         tabela0=[]
         tabela1=[]
         tabela1_1=[]
@@ -138,15 +134,15 @@ for fc in range (1000, 10000, 1000):
         q = np.sin(2 * np.pi * t * fc) * 2 ** 14
         iq = i + 1j * q
 
-        i1 = np.cos(2 * np.pi * t * fc) * 2 ** 14
-        q1 = np.sin(2 * np.pi * t * fc) * 2 ** 14
+        i1 = np.cos(2 * np.pi * t * fc +(e*np.pi)) * 2 ** 14
+        q1 = np.sin(2 * np.pi * t * fc+(e*np.pi)) * 2 ** 14
         iq1 = i1 + 1j * q1
 
 
         sdr.tx([iq ,iq1])
         time.sleep(2)
     
-    with open('pomiary_02_02/pomiar{}_LO1GHz.txt'.format(fc), 'w') as plik:
+    with open('wyniki_29_01/pomiar{}_LO1GHz.txt'.format(fc), 'w') as plik:
     # Zapisz dane do pliku
         for element in wyniki:
             plik.write(str(element) + '\n')
