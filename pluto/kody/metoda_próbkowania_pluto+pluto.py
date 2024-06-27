@@ -87,12 +87,12 @@ for fc in range (20000, 30000, 40000):
                 result.append((tabela0[i] - tabela1[i]))
         
         #print(próbki_na_okres)
-        if tabela0[0] < tabela1[0] :
-            for i in range(min(len(tabela1), len(tabela0))) :
-                result.append((tabela1[i] - tabela0[i]))
-        else :
-            for j in range(min(len(tabela1), len(tabela0))) :
-                result.append((tabela0[j] - tabela1[j]))
+        #if tabela0[0] < tabela1[0] :
+        #    for i in range(min(len(tabela1), len(tabela0))) :
+        #        result.append((tabela1[i] - tabela0[i]))
+        #else :
+        #    for j in range(min(len(tabela1), len(tabela0))) :
+        #        result.append((tabela0[j] - tabela1[j]))
         
         with open('wyniki_29_01/wyniki/{}.txt'.format(statistics.median(result)), 'w') as plik:
         # Zapisz dane do pliku
