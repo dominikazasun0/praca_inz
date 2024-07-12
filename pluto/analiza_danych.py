@@ -32,13 +32,13 @@ for fc in fc_v :
         #with open("praca_inz/pluto/pomiary_21_02/pomiar80000_fs6000000_LO0.8GHz_med_long_1.txt".format(lo), "r") as file:
         #with open("wyniki_29_01/Rx_0/Rx_071.0.txt".format(lo), "r") as file:
         #with open("pomiary_02_02/0.125_stopnia/seria_1/pomir1000_LO500MHz.txt".format(lo), "r") as file:
-        with open("26_03/pomiar80000_fs6000000_LO1GHz_looong.txt", "r") as file:
+        with open("26_03/pomiar80000_fs6000000_LO1GHz_20_G0_inny_dzielnik.txt", "r") as file:
         #with open("15_04/pomiar80000_fs2000000_LO2GHz_zmiana_5.txt", "r") as file:
             numbers = [float(line.strip()) for line in file]
             #numbers[44+8]=180-numbers[44+8]
             start=numbers[0]
             for j in range(1, len(numbers)):
-                error = (abs(numbers[j] - start)-1)
+                error = (abs(numbers[j] - start)-5)
                 #print(numbers[j],start,error)
                 if error < 5000:
                     #if abs(abs(180 - numbers[j] - start) - 1) > error:  # Warunek dodania drugiego typu błędu
@@ -52,7 +52,7 @@ for fc in fc_v :
         #sub[35]=0.49
         #sub.pop(17)
         #numbers[6+46]=180-numbers[6+46]
-        plt.plot(numbers)
+        plt.plot(sub)
         #plt.plot(avg,np.array(numbers[4:40])-np.array(avg))
         #plt.plot(numbers[15:],sub[14:])
         #plt.plot(numbers[9:45],"o-")

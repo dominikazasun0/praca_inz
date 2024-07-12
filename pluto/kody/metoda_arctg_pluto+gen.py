@@ -16,13 +16,13 @@ sdr.sample_rate = 6000000 # częstotliwość próbkowania
 sdr.rx_rf_bandwidth = sdr.sample_rate # szerokość pasma odbiornika
 sdr.rx_lo = 1000080000 # częstotliwość LO odbiornika
 #
-#sdr.gain_control_mode_chan0 = "manual" # turn off AGC
-#sdr.gain_control_mode_chan1 = "manual"
-#gain = 25# allowable range is 0 to 74.5 dB
-#sdr.rx_hardwaregain_chan0 = 25# set receive gain
-#sdr.rx_hardwaregain_chan1 = gain
-sdr.gain_control_mode_chan0 = "slow_attack"
-sdr.gain_control_mode_chan1 = "slow_attack"
+sdr.gain_control_mode_chan0 = "manual" # turn off AGC
+sdr.gain_control_mode_chan1 = "manual"
+gain = 0# allowable range is 0 to 74.5 dB
+sdr.rx_hardwaregain_chan0 = gain# set receive gain
+sdr.rx_hardwaregain_chan1 = gain
+#sdr.gain_control_mode_chan0 = "slow_attack"
+#sdr.gain_control_mode_chan1 = "slow_attack"
 sdr.rx_buffer_size = 32768
 sdr.tx_buffer_size = 32768
 
@@ -46,7 +46,7 @@ zeros_ch1=[]      # Miejsca zerowe chan1
 
 wyniki_med=[]
 
-for e in range(30):
+for e in range(40):
     
     data = sdr.rx() #Odbiór danych
     
@@ -111,15 +111,16 @@ for e in range(30):
     for i in range(0,len(arc_tg_diff)):#oddzielenie części dodatniej sygnału prostokątnego
         if arc_tg_diff[i] > 0:
             arc_tg_dod.append(arc_tg_diff[i])
-            
+    
+    print("ustaw", 360+50*e)
     print("mediana",np.rad2deg(statistics.median(arc_tg_dod)))
     print("\n")
     wyniki_med.append(np.rad2deg(statistics.median(arc_tg_dod)))
     
-    plt.plot(ch0[:100], 'ro-')
-    plt.plot(ch1[:100], 'bo-')
+    #plt.plot(ch0[:100], 'ro-')
+    #plt.plot(ch1[:100], 'bo-')
 
-    plt.show()
+    #plt.show()
     
 
 
@@ -131,10 +132,10 @@ for e in range(30):
     zeros_ch1=[]
     arc_tg_dod=[]
     order=[]
-    time.sleep(13)
+    time.sleep(20)
 
 
-#with open('26_03/pomiar{}_fs{}_LO{}GHz_longxd.txt'.format(80000,sdr.sample_rate,1.25), 'w') as plik:
+with open('26_03/pomiar{}_fs{}_LO{}GHz_20_G0_inny_dzielnik.txt'.format(80000,sdr.sample_rate,1), 'w') as plik:
 # Zapisz dane do pliku
-#    for element in wyniki_med:
-#        plik.write(str(element) + '\n')
+    for element in wyniki_med:
+        plik.write(str(element) + '\n')

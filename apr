@@ -37,18 +37,24 @@ for j  in range(0,len(i1)):
     
 okolice_0=i[tabela0[0]-10:tabela0[0]+10]
 okolice_0_x=list(range(tabela0[0]-10,tabela0[0]+10,1))
-coefficients = np.polyfit(okolice_0_x, okolice_0,1)
+coefficients = np.polyfit(okolice_0_x, okolice_0,4)
 polynomial = np.poly1d(coefficients)
 roots = polynomial.roots
+start_x=[]
+for q in range (0,len(roots)):
+    start_x.append(abs(roots[q]-tabela0[0]))
+real = np.argmin(start_x)
+print(real)
+print(roots[real])
 x_new = np.linspace(-1000,1000,10000)
 y_poly = polynomial(x_new)
-print(polynomial)
-print(okolice_0)
-print(tabela0)    
-print(tabela1)    
+#print(polynomial)
+#print(okolice_0)
+#print(tabela0)    
+#print(tabela1)    
 print(roots)
 
-#plt.plot(i)
-plt.plot(y_poly)
+plt.plot(i)
+plt.plot(x_new, y_poly)
 #plt.plot(i1)
 plt.show()
