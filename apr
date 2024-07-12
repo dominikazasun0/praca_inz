@@ -1,0 +1,54 @@
+import matplotlib.pyplot as plt
+import numpy as np
+
+N = 2000
+ts = 1 / float(1000000)
+t = np.arange(0, N * ts, ts)
+fc=1000
+ # wielkość bufora danych (ilość próbek sygnału wysyłana podczas jednej transmisji)
+tabela0=[] 
+tabela1=[]
+tabela1_1=[]
+tabela0_1=[] 
+i = np.cos(2 * np.pi * t * fc) * 2 ** 14
+q = np.sin(2 * np.pi * t * fc) * 2 ** 14
+iq = i + 1j * q
+
+i1 = np.cos(2 * np.pi * t * fc) * 2 ** 14
+q1 = np.sin(2 * np.pi * t * fc) * 2 ** 14
+iq1 = i1 + 1j * q1
+
+
+
+prev=i[0]
+prev1=i1[0]
+
+for k in range(0,len(i)):
+    if i[k].real <= 0 and prev.real > 0 :
+        tabela0.append(k)
+        tabela0_1.append(i[k].real)
+    prev=i[k]
+
+for j  in range(0,len(i1)):
+    if i1[j].real <= 0 and prev1.real > 0:
+        tabela1.append(j)
+        tabela1_1.append(i1[j].real)
+    prev1=i1[j]
+    
+okolice_0=i[tabela0[0]-10:tabela0[0]+10]
+okolice_0_x=list(range(tabela0[0]-10,tabela0[0]+10,1))
+coefficients = np.polyfit(okolice_0_x, okolice_0,1)
+polynomial = np.poly1d(coefficients)
+roots = polynomial.roots
+x_new = np.linspace(-1000,1000,10000)
+y_poly = polynomial(x_new)
+print(polynomial)
+print(okolice_0)
+print(tabela0)    
+print(tabela1)    
+print(roots)
+
+#plt.plot(i)
+plt.plot(y_poly)
+#plt.plot(i1)
+plt.show()
